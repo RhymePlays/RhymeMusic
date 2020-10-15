@@ -1,0 +1,211 @@
+html{height: 100%;/*FooterStickTrick*/}
+body{
+    font-family: "Roboto", Arial, Helvetica, sans-serif;
+    background: #303030;
+    margin: 0;
+
+    display: flex;/*FooterStickTrick*/
+    flex-direction: column;/*FooterStickTrick*/
+    min-height: 100%;/*FooterStickTrick*/
+}
+
+/* TitleBar */
+#TitleBar svg{height: 40px; width: 40px;}
+#TitleBar{
+    background: #505050;
+    height: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+}
+#CloseWinButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #FB1E46;
+    fill: #303030;
+    min-height: 40px;max-height: 40px;
+    min-width: 40px;max-width: 40px;
+    transition: 150ms;
+}#CloseWinButton:hover{filter: brightness(75%);transition: filter 200ms}
+#MaximizeButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #303030;
+    fill: #F3F3F3;
+    min-height: 40px;max-height: 40px;
+    min-width: 40px;max-width: 40px;
+    transition: 150ms;
+}#MaximizeButton:hover{filter: brightness(75%);transition: filter 200ms}
+#MinimizeButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    background: #303030;
+    fill: #F3F3F3;
+    min-height: 40px;max-height: 40px;
+    min-width: 40px;max-width: 40px;
+    transition: 150ms;
+}#MinimizeButton:hover{filter: brightness(75%);transition: filter 200ms}
+#TitleBarSpacer{
+    width: 100%;
+    -webkit-app-region: drag; /*Makes Drag Possible*/
+}
+#AddSongsButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #25FFB1;
+    fill: #303030;
+    min-height: 40px;max-height: 40px;
+    min-width: 40px;max-width: 40px;
+    transition: 150ms;
+}#AddSongsButton:hover{filter: brightness(75%);transition: filter 200ms}
+
+/* Drawer */
+#Drawer{
+    margin-top: 40px;
+    position: fixed;
+    height: 100%;
+
+    background-color: #606060;
+    width: 230px;
+    border-top-right-radius: 25px;
+}
+#DrawerTopRow{
+    display: flex;
+}
+#DrawerToggleButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+
+    width: 40px;
+    height: 40px;
+    background-color: #1BADFF;
+    border-bottom-right-radius: 10px;
+}
+#DrawerToggleButton svg{height: 35px; width: 35px;}
+#DrawerLogoHolder{
+    height: 30px;
+    padding-top: 5px;
+}
+
+/* Playback Control*/
+#PlaybackControls{
+    margin-top: auto;/*FooterStickTrick*/
+    margin-left: 230px;
+    height: 75px;
+    background: #505050;
+    fill: #303030;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;   
+}#PlaybackControls svg{height: 50px; width: 50px;}
+#PreviousButton{
+    background: transparent;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    transition: 150ms;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#PreviousButton:hover{background: #454545;transition: 200ms;}
+#NextButton{
+    background: transparent;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    transition: 150ms;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#NextButton:hover{background: #454545;transition: 200ms;}
+#MainActionButton{
+    background: #303030;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    margin: 0px 10px;
+    transition: 150ms;
+    fill: #505050;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#MainActionButton svg{height: 50px; width: 50px;}
+#MainActionButton:hover{background: #353535;transition: 200ms;}
+#SuffleOrLoopDiv{
+    background: #303030;
+    width: 100px;
+    height: 50px;
+    border-radius: 50px;
+    margin-right: 10px;
+    transition: 150ms;
+    fill: #606060;
+    
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}#SuffleOrLoopDiv svg{margin-top: 5px; height: 30px; width: 30px;}
+#SuffleOrLoopDiv:hover{background: #353535;transition: 200ms;}
+#SoundControlDiv{
+    background: #303030;
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    margin-left: 10px;
+    transition: 150ms;
+    fill: #606060;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#SoundControlDiv svg{margin-top: 5px; height: 30px; width: 30px;}
+#SoundControlDiv:hover{
+    padding-right: 5px;
+    justify-content: space-evenly;
+    background: #353535;
+    width: 160px;
+    transition: 200ms;
+}
+#SoundSlider{
+    display: none;
+    -webkit-appearance: none;
+    background: #FB1E46;
+    width: 100%;
+    max-width: 100px;
+    height: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+#SoundSlider::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background: #25FFB1;
+    transition: 150ms;
+}#SoundSlider::-webkit-slider-thumb:hover{box-shadow: 0 0 0 10px #25ffb330;transition: 200ms;}
+#SoundControlDiv:hover #SoundSlider{display: block;}
+#ClosedCaptionsToggle{
+    background: transparent;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    margin-left: 10px;
+    transition: 150ms;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#ClosedCaptionsToggle:hover{background: #454545;transition: 200ms;}
