@@ -1,0 +1,14 @@
+{
+  "name": "rhymemusic",
+  "version": "0.1.0",
+  "description": "Music/Audio playing app.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Isfar Tausif Rhyme",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^10.1.3"
+  }
+}
