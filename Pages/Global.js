@@ -1,7 +1,6 @@
-const { fstat } = require('fs')
-
 const {BrowserWindow, getCurrentWindow} = require('electron').remote
 
+// Variables
 var win = getCurrentWindow()
 
 // TitleBarLogic
@@ -11,3 +10,40 @@ function closeWindow(){win.close()}
 function maximizeWindow(){win.isMaximized() ? win.unmaximize() : win.maximize()}
 function minimizeWindow(){win.minimize()}
 
+// ToggleDrawer
+function ToggleDrawer(){
+    var drawerDisplay=document.getElementById("Drawer").style.display
+    if(drawerDisplay=="block" || !drawerDisplay){
+        document.getElementById("Drawer").style.display="none"
+        document.getElementById("PlaybackControls").style.marginLeft="0px"
+        document.getElementById("MainBody").style.marginLeft="0px"
+    }else{
+        document.getElementById("Drawer").style.display="block"
+        document.getElementById("PlaybackControls").style.marginLeft="230px"
+        document.getElementById("MainBody").style.marginLeft="230px"
+    }
+}
+
+// VolumeProgress
+function refreshVolume(){
+    SoundSliderValue = document.getElementById("SoundSlider").value
+    document.getElementById("SoundSlider").style.background = "linear-gradient(to right, #FB1E46 "+(SoundSliderValue).toString()+"%, #606060 "+(SoundSliderValue).toString()+"%)"
+}
+
+// MusicProgress
+function refreshMusicProgressController(){
+    MusicProgressValue = document.getElementById("MusicProgressBar").value
+    document.getElementById("MusicProgressBar").style.background = "linear-gradient(to right, #FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
+    document.getElementById("MainActionProgress").style.background = "conic-gradient(#FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
+}
+function MusicProgressIncrement(addValue, jump){
+    MusicProgressValue = document.getElementById("MusicProgressBar").value
+    MusicProgressNewValue = parseInt(MusicProgressValue) + addValue
+    if (jump && MusicProgressNewValue<=500 && MusicProgressNewValue>=0){
+        document.getElementById("MusicProgressBar").value = (MusicProgressNewValue).toString()
+        refreshMusicProgressController()
+    }
+    else{
+        refreshMusicProgressController()
+    }
+}

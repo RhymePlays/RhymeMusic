@@ -1,3 +1,4 @@
+/* Global */
 html{height: 100%;/*FooterStickTrick*/}
 body{
     font-family: "Roboto", Arial, Helvetica, sans-serif;
@@ -8,6 +9,15 @@ body{
     flex-direction: column;/*FooterStickTrick*/
     min-height: 100%;/*FooterStickTrick*/
 }
+input{outline: none;}
+::selection {background: transparent;}
+
+::-webkit-scrollbar{height: 5px;}
+::-webkit-scrollbar-thumb{background: #303030;border-radius: 5px;}
+::-webkit-scrollbar-track{background:  #353535;}
+
+/* Assets */
+.Spacer{width: 100%;}
 
 /* TitleBar */
 #TitleBar svg{height: 40px; width: 40px;}
@@ -68,46 +78,115 @@ body{
 }#AddSongsButton:hover{filter: brightness(75%);transition: filter 200ms}
 
 /* Drawer */
-#Drawer{
-    margin-top: 40px;
-    position: fixed;
-    height: 100%;
-
-    background-color: #606060;
-    width: 230px;
-    border-top-right-radius: 25px;
-}
-#DrawerTopRow{
-    display: flex;
-}
 #DrawerToggleButton{
+    position: fixed;
+    top: 40px;
     display: flex;
     justify-content: center;
     align-items: center;    
 
     width: 40px;
     height: 40px;
-    background-color: #1BADFF;
+    background: #1BADFF;
     border-bottom-right-radius: 10px;
-}
+}#DrawerToggleButton:hover{filter: brightness(75%);transition: filter 200ms}
 #DrawerToggleButton svg{height: 35px; width: 35px;}
-#DrawerLogoHolder{
+#Drawer{
+    display: block;
+    margin-top: 40px;
+    position: fixed;
+    height: 100%;
+
+    background: #606060;
+    width: 230px;
+    border-top-right-radius: 25px;
+}
+#DrawerLogo{
+    padding-left:40px ;
     height: 30px;
     padding-top: 5px;
+}
+.DrawerSection{
+    margin-top: 10px;
+    padding-bottom: 10px;
+    background: #505050;
+}
+
+.DrawerSectionDropDown{height: 50px; width: 50px;min-width: 50px;transform: rotate(180deg);}
+.DrawerSectionDropDown:hover{border-radius: 100%;background: #35353535;transition: 200ms;}
+
+.DrawerSectionPlay{height: 50px; width: 50px;min-width: 50px;fill: #25FFB1;transition: 150ms;}
+.DrawerSectionPlay:hover{border-radius: 100%;background: #35353535;transition: 200ms;}
+
+.DrawerSectionPause{height: 50px; width: 50px;min-width: 50px;fill: #FB1E46;transition: 150ms;}
+.DrawerSectionPause:hover{border-radius: 100%;background: #35353535;transition: 200ms;}
+
+.DrawerSectionTitle{
+    height: 50px;
+    border-radius: 15px 15px 0px 0px;
+    padding: 0px 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #F3F3F3;
+    background: #1BADFF;
+    fill: #F3F3F3;
+    overflow: auto;
+
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+.DrawerSectionItem{
+    margin-top: 5px;
+    height: 50px;
+    padding: 0px 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #F3F3F3;
+    background: #606060;
+    overflow: auto;
+
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+.DrawerSectionItemSelected{
+    color: #303030;
+    background: #25FFB1;
 }
 
 /* Playback Control*/
 #PlaybackControls{
+    position: relative;
+    bottom: 0;
     margin-top: auto;/*FooterStickTrick*/
     margin-left: 230px;
     height: 75px;
+    padding-top: 5px;
     background: #505050;
     fill: #303030;
 
     display: flex;
     justify-content: center;
-    align-items: center;   
+    align-items: center;
 }#PlaybackControls svg{height: 50px; width: 50px;}
+#MusicProgressBar{
+    position: absolute;
+    top: -2px;
+
+    -webkit-appearance: none;
+    height: 5px;
+    width: 100%;
+    background: linear-gradient(to right, #FB1E46 0%, #505050 0%);
+}
+#MusicProgressBar::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    height: 8px;
+    width: 8px;
+    border-radius: 10px;
+    background: #25FFB1;
+    transition: 150ms;
+}#MusicProgressBar::-webkit-slider-thumb:hover{box-shadow: 0 0 0 10px #25ffb330;transition: 200ms;}
 #PreviousButton{
     background: transparent;
     width: 50px;
@@ -135,7 +214,7 @@ body{
     width: 50px;
     height: 50px;
     border-radius: 100%;
-    margin: 0px 10px;
+    /* margin: 0px 10px; */
     transition: 150ms;
     fill: #505050;
 
@@ -144,6 +223,17 @@ body{
     align-items: center;
 }#MainActionButton svg{height: 50px; width: 50px;}
 #MainActionButton:hover{background: #353535;transition: 200ms;}
+#MainActionProgress{
+    background: conic-gradient(#FB1E46 0%, #505050 0%);
+    width: 56px;
+    height: 56px;
+    border-radius: 100%;
+    margin: 0px 10px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 #SuffleOrLoopDiv{
     background: #303030;
     width: 100px;
@@ -181,12 +271,11 @@ body{
 #SoundSlider{
     display: none;
     -webkit-appearance: none;
-    background: #FB1E46;
+    background: linear-gradient(to right, #FB1E46 100%, #606060 100%);
     width: 100%;
     max-width: 100px;
     height: 5px;
     border-radius: 5px;
-    outline: none;
 }
 #SoundSlider::-webkit-slider-thumb{
     -webkit-appearance: none;
@@ -208,4 +297,146 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-}#ClosedCaptionsToggle:hover{background: #454545;transition: 200ms;}
+}#ClosedCaptionsToggle svg{height: 40px; width: 40px;}
+#ClosedCaptionsToggle:hover{background: #454545;transition: 200ms;}
+
+/* MainBody */
+#BackGroundImage{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    margin-left: -150px;
+    margin-top: -50px;
+}
+#MainBody{
+    margin-top: 40px;
+    margin-left: 230px;
+    padding: 10px;
+}
+#SearchBar{
+    position: absolute;
+    top: 40px;
+    right: 120px;
+
+    background: #505050;
+    width: 295px;
+    height: 40px;
+    border-radius: 0px 0px 10px 10px;
+}
+#SearchFilter{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+
+    height: 30px;
+    border-radius: 0px 0px 8px 8px;
+    background: #303030;
+    color: #606060;
+    font-weight: bold;
+    border: none;
+}
+#SearchField{
+    position: absolute;
+    top: 5px;
+    right: 40px;
+
+    border-bottom-left-radius: 8px;    
+    height: 30px;
+    border: none;
+    padding: 0px 5px;
+    background: #303030;
+    color: #F3F3F3;
+}#SearchField::selection{
+    background: #25FFB1;
+}
+#SearchButton{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+
+    height: 30px;
+    width: 35px;
+    border-bottom-right-radius: 8px;
+    background: #25FFB1;
+    fill: #505050;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* SongItem */
+.SongItem{
+    float: left;
+    position: relative;
+    width: 200px;
+    height: 300px;
+    border-radius: 15px;
+    padding-right: 10px;
+    padding-top: 10px;
+}
+.SongItemPlay{
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    height: 40px;
+    width: 40px;
+    fill: #1BADFF;
+    border-radius: 100%;
+    transition: 150ms;
+}.SongItemPlay:hover{
+    background: #35353535;
+    transition: 200ms;
+}
+.SongItemMore{
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    height: 40px;
+    width: 40px;
+    fill: #F3F3F3;
+    border-radius: 100%;
+    transition: 150ms;
+}.SongItemMore:hover{
+    background: #35353535;
+    transition: 200ms;
+}
+.SongItemLength{
+    position: absolute;
+    background: #35353535;
+    color: #F3F3F3;
+    padding: 5px;
+    border-radius: 5px;
+    bottom: 110px;
+    right: 10px;
+}
+.SongItemDisplay{
+    background: #505050;
+    width: 200px;
+    height: 200px;
+    border-radius: 15px 15px 0px 0px;
+}
+.SongItemInfo{
+    position: relative;
+    background: #1BADFF;
+    width: 200px;
+    height: 100px;
+    border-radius: 0px 0px 15px 15px;
+    color: #303030;
+}
+.SongItemInfo SongName{
+    position: absolute;
+    top: 8px;
+    left: 8px;
+
+    font-size: 20px;
+    font-weight: bold;
+}
+.SongItemInfo OtherInfo{
+    position: absolute;
+    top: 50px;
+    left: 8px;
+
+    font-size: 18px;
+}

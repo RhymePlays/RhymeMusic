@@ -5,7 +5,6 @@ function createMainWin(){
     win = new BrowserWindow({
         "width": 800,
         "height": 500,
-        // "transparent": true,
         "frame": false,
         "webPreferences": {
             "nodeIntegration": true,
