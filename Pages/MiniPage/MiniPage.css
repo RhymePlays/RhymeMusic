@@ -1,0 +1,245 @@
+/* Global */
+html{height: 100%;/*FooterStickTrick*/}
+body{
+    height: 100%;
+    font-family: Montserrat, Roboto, Arial, Helvetica, sans-serif;
+    background: #303030;
+    margin: 0;
+    cursor: default;
+    color: #F3F3F3;
+
+    display: flex;/*FooterStickTrick*/
+    flex-direction: column;/*FooterStickTrick*/
+    min-height: 100%;/*FooterStickTrick*/
+}
+
+input{outline: none;}
+::selection {background: transparent;}
+
+/* Display */
+#MiniMainSection{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 50px;
+}
+#MiniDisplay{
+    position: absolute;
+    top: 0;
+    right: 50px;
+    left: 0;
+    bottom: 0;
+    background: #303030;
+    background-image: url("../Assets/BackLogo.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+#MiniSongLength{
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+
+    font-size: 20px;
+    background: #45454580;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* PlaybackControls */
+#MiniPlaybackControls{
+    max-height: 75px;
+    min-height: 75px;
+    background: #505050;
+    margin-right: 50px;
+    margin-top: auto;/*FooterStickTrick*/
+    position: relative;
+    fill: #303030;
+    padding-top: 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}#MiniPlaybackControls svg{height: 50px; width: 50px;}
+#MiniTitleBar{
+    position: absolute;
+    top: -50px;
+    width: 100%;
+    height: 50px;
+    background: #606060;
+
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+#MiniMusicProgressBar{
+    position: absolute;
+    top: -2px;
+
+    -webkit-appearance: none;
+    height: 5px;
+    width: 100%;
+    background: linear-gradient(to right, #FB1E46 0%, #505050 0%);
+}
+#MiniMusicProgressBar::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    height: 5px;
+    width: 5px;
+    border-radius: 10px;
+    background: #25FFB1;
+    transition: 150ms;
+}#MiniMusicProgressBar::-webkit-slider-thumb:hover{box-shadow: 0 0 0 10px #25ffb330;transition: 200ms;}
+#MiniPreviousButton{
+    background: transparent;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    transition: 150ms;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#MiniPreviousButton:hover{background: #454545;transition: 200ms;}
+#MiniNextButton{
+    background: transparent;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    transition: 150ms;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#MiniNextButton:hover{background: #454545;transition: 200ms;}
+#MiniMainActionButton{
+    background: #303030;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    /* margin: 0px 10px; */
+    transition: 150ms;
+    fill: #505050;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#MiniMainActionButton svg{height: 50px; width: 50px;}
+#MiniMainActionButton:hover{background: #353535;transition: 200ms;}
+#MiniMainActionProgress{
+    background: conic-gradient(#FB1E46 0%, #505050 0%);
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
+    border-radius: 100%;
+    margin: 0px 10px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Extention */
+#MiniPlaybackControlExtention{
+    position: absolute;
+    right: 0px;
+    height: 100%;
+    width: 50px;
+    background: #505050;
+}
+
+#MaxPlayerButton{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+
+    fill: #25FFB1;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 150ms;
+}#MaxPlayerButton:hover{background: #35353580;transition: 200ms;}
+#MaxPlayerButton svg{height: 40px; width: 40px;}
+#MiniSuffleButton{
+    position: absolute;
+    bottom: 330px;
+    right: 0px;
+
+    fill: #303030;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 150ms;
+}#MiniSuffleButton:hover{background: #35353580;transition: 200ms;}
+#MiniSuffleButton svg{height: 40px; width: 40px;}
+#MiniClosedCaptionsToggle{
+    position: absolute;
+    bottom: 270px;
+    right: 0px;
+
+    fill: #303030;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 150ms;
+}#MiniClosedCaptionsToggle:hover{background: #35353580;transition: 200ms;}
+#MiniClosedCaptionsToggle svg{height: 40px; width: 40px;}
+
+#MiniSoundControlDiv{
+    position: absolute;
+    bottom: 80px;
+    right: 0px;
+    width: 50px;
+    height: 175px;
+}
+#MiniSound{
+    position: absolute  ;
+    bottom: 0px;
+    right: 0px;
+
+    fill: #303030;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 150ms;
+}#MiniSound:hover{background: #35353580;transition: 200ms;}
+#MiniSound svg{height: 40px; width: 40px;}
+#MiniSoundSlider{
+    position: absolute  ;
+    top: 50px;
+    left: -25px;
+
+    transform: rotate(270deg);
+    -webkit-appearance: none;
+    background: linear-gradient(to right, #FB1E46 100%, #606060 100%);
+    width: 100px;
+    max-width: 100px;
+    height: 5px;
+    border-radius: 5px;
+}
+#MiniSoundSlider::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background: #25FFB1;
+    transition: 150ms;
+}#MiniSoundSlider::-webkit-slider-thumb:hover{box-shadow: 0 0 0 10px #25ffb330;transition: 200ms;}

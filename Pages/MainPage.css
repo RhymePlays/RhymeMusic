@@ -1,9 +1,11 @@
 /* Global */
 html{height: 100%;/*FooterStickTrick*/}
 body{
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
+    height: 100%;/*SubWindow Trick*/
+    font-family: Montserrat, Roboto, Arial, Helvetica, sans-serif;
     background: #303030;
     margin: 0;
+    cursor: default;
 
     display: flex;/*FooterStickTrick*/
     flex-direction: column;/*FooterStickTrick*/
@@ -13,8 +15,8 @@ input{outline: none;}
 ::selection {background: transparent;}
 
 ::-webkit-scrollbar{height: 5px;}
-::-webkit-scrollbar-thumb{background: #303030;border-radius: 5px;}
-::-webkit-scrollbar-track{background:  #353535;}
+::-webkit-scrollbar-thumb{background: #606060;border-radius: 15px;}
+::-webkit-scrollbar-track{background:  #404040;}
 
 /* Assets */
 .Spacer{width: 100%;}
@@ -112,14 +114,14 @@ input{outline: none;}
     background: #505050;
 }
 
-.DrawerSectionDropDown{height: 50px; width: 50px;min-width: 50px;transform: rotate(180deg);}
-.DrawerSectionDropDown:hover{border-radius: 100%;background: #35353535;transition: 200ms;}
+.DrawerSectionDropDown{border-radius: 100%;height: 50px; width: 50px;min-width: 50px;transform: rotate(180deg);transition: 150ms;}
+.DrawerSectionDropDown:hover{background: #35353535;transition: 200ms;}
 
-.DrawerSectionPlay{height: 50px; width: 50px;min-width: 50px;fill: #25FFB1;transition: 150ms;}
-.DrawerSectionPlay:hover{border-radius: 100%;background: #35353535;transition: 200ms;}
+.DrawerSectionPlay{border-radius: 100%;height: 50px; width: 50px;min-width: 50px;fill: #25FFB1;transition: 150ms;}
+.DrawerSectionPlay:hover{background: #35353535;transition: 200ms;}
 
-.DrawerSectionPause{height: 50px; width: 50px;min-width: 50px;fill: #FB1E46;transition: 150ms;}
-.DrawerSectionPause:hover{border-radius: 100%;background: #35353535;transition: 200ms;}
+.DrawerSectionPause{border-radius: 100%;height: 50px; width: 50px;min-width: 50px;fill: #FB1E46;transition: 150ms;}
+.DrawerSectionPause:hover{background: #35353535;transition: 200ms;}
 
 .DrawerSectionTitle{
     height: 50px;
@@ -161,7 +163,7 @@ input{outline: none;}
     bottom: 0;
     margin-top: auto;/*FooterStickTrick*/
     margin-left: 230px;
-    height: 75px;
+    height: 100px;
     padding-top: 5px;
     background: #505050;
     fill: #303030;
@@ -169,7 +171,55 @@ input{outline: none;}
     display: flex;
     justify-content: center;
     align-items: center;
+    /* overflow: hidden; */
 }#PlaybackControls svg{height: 50px; width: 50px;}
+#SongInfoSpacer{height: 70px;min-width: 400px;margin-left: 5px;transition: 150ms;}
+#SongInfo{
+    position: absolute;
+    top: 10px;
+    left: 5px;
+    height: 70px;
+    max-width: 400px;
+    min-width: 400px;
+    border-radius: 10px;
+
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    transition: 150ms;
+}#SongInfo:hover{background: #454545;transition: 200ms;}
+#SongInfoPicture{
+    background: #F3F3F3;
+    min-height: 70px;
+    min-width: 70px;
+    border-radius: 10px;
+    margin-right: 5px;
+}
+#SongInfoText{
+    display: flex;
+    flex-direction: column;
+    color: #F3F3F3;
+}
+#SongInfoName{font-size: 20px;font-weight: bold;}
+#SongInfoArtist{font-size: 18px;}
+#SongInfoGenre{font-size: 18px;font-weight: lighter;}
+@media (max-width: 1310px) {
+    #SongInfoSpacer{min-width: 0px;transition: 200ms;}
+    #SongInfo{
+        top: -100px;
+        left: 10px;
+        background: #25FFB1;
+        padding: 10px;
+    }
+    #SongInfoText{color: #303030;}
+    #SongInfoPicture{background: #303030;}
+    #SongInfo:hover{
+        background: #25ffb3;
+        opacity: 0.9;
+    }
+    #MainBody{margin-bottom: 95px;}
+    #MainBody::-webkit-scrollbar-track{border-radius: 15px;}
+}
 #MusicProgressBar{
     position: absolute;
     top: -2px;
@@ -181,8 +231,8 @@ input{outline: none;}
 }
 #MusicProgressBar::-webkit-slider-thumb{
     -webkit-appearance: none;
-    height: 8px;
-    width: 8px;
+    height: 5px;
+    width: 5px;
     border-radius: 10px;
     background: #25FFB1;
     transition: 150ms;
@@ -225,8 +275,10 @@ input{outline: none;}
 #MainActionButton:hover{background: #353535;transition: 200ms;}
 #MainActionProgress{
     background: conic-gradient(#FB1E46 0%, #505050 0%);
-    width: 56px;
-    height: 56px;
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
     border-radius: 100%;
     margin: 0px 10px;
 
@@ -236,7 +288,8 @@ input{outline: none;}
 }
 #SuffleOrLoopDiv{
     background: #303030;
-    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
     height: 50px;
     border-radius: 50px;
     margin-right: 10px;
@@ -250,7 +303,8 @@ input{outline: none;}
 #SuffleOrLoopDiv:hover{background: #353535;transition: 200ms;}
 #SoundControlDiv{
     background: #303030;
-    width: 50px;
+    max-width: 50px;
+    min-width: 50px;
     height: 50px;
     border-radius: 50px;
     margin-left: 10px;
@@ -265,7 +319,8 @@ input{outline: none;}
     padding-right: 5px;
     justify-content: space-evenly;
     background: #353535;
-    width: 160px;
+    max-width: 160px;
+    min-width: 160px;
     transition: 200ms;
 }
 #SoundSlider{
@@ -288,7 +343,8 @@ input{outline: none;}
 #SoundControlDiv:hover #SoundSlider{display: block;}
 #ClosedCaptionsToggle{
     background: transparent;
-    width: 50px;
+    max-width: 50px;
+    min-width: 50px;
     height: 50px;
     border-radius: 100%;
     margin-left: 10px;
@@ -299,8 +355,32 @@ input{outline: none;}
     align-items: center;
 }#ClosedCaptionsToggle svg{height: 40px; width: 40px;}
 #ClosedCaptionsToggle:hover{background: #454545;transition: 200ms;}
+#MiniPlayerButton{
+    background: transparent;
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    margin-left: 10px;
+    transition: 150ms;
 
-/* MainBody */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#MiniPlayerButton:hover{background: #454545;transition: 200ms;}
+#SongLength{
+    background: #606060;
+    padding: 8px;
+    margin: 8px;
+    border-radius: 10px;
+    color: #F3F3F3;
+    font-size: 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* _MainBody_ */
 #BackGroundImage{
     position: absolute;
     top: 50%;
@@ -308,11 +388,6 @@ input{outline: none;}
     width: 300px;
     margin-left: -150px;
     margin-top: -50px;
-}
-#MainBody{
-    margin-top: 40px;
-    margin-left: 230px;
-    padding: 10px;
 }
 #SearchBar{
     position: absolute;
@@ -365,16 +440,24 @@ input{outline: none;}
     align-items: center;
     justify-content: center;
 }
+#MainBody{
+    height: 100%;/*SubWindow Trick*/
+    overflow: auto;/*SubWindow Trick*/
+    margin-top: 45px;
+    margin-left: 230px;
+    padding: 10px;
+    background: #303030;
+    display: flex;
+    flex-wrap: wrap;
+}
 
 /* SongItem */
 .SongItem{
-    float: left;
     position: relative;
     width: 200px;
     height: 300px;
     border-radius: 15px;
-    padding-right: 10px;
-    padding-top: 10px;
+    padding: 5px;
 }
 .SongItemPlay{
     position: absolute;
@@ -408,8 +491,8 @@ input{outline: none;}
     color: #F3F3F3;
     padding: 5px;
     border-radius: 5px;
-    bottom: 110px;
-    right: 10px;
+    bottom: 115px;
+    right: 15px;
 }
 .SongItemDisplay{
     background: #505050;

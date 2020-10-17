@@ -24,6 +24,19 @@ function ToggleDrawer(){
     }
 }
 
+// ToggleDrawerSection
+function ToggleDrawerSection(id){
+    try{
+        if(document.getElementById(id).getElementsByTagName("svg")[0].style.transform=="rotate(180deg)"){
+            document.getElementById(id).getElementsByClassName("DrawerSectionItemContainer")[0].style.display="none"
+            document.getElementById(id).getElementsByTagName("svg")[0].style.transform="rotate(0deg)"
+        }else{
+            document.getElementById(id).getElementsByClassName("DrawerSectionItemContainer")[0].style.display="block"
+            document.getElementById(id).getElementsByTagName("svg")[0].style.transform="rotate(180deg)"
+        }
+    }catch(e){null}
+}
+
 // VolumeProgress
 function refreshVolume(){
     SoundSliderValue = document.getElementById("SoundSlider").value

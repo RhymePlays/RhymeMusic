@@ -1,10 +1,15 @@
-const {app, BrowserWindow, Menu} = require("electron")
+const {app, BrowserWindow, screen} = require("electron")
 
 // Main Window
 function createMainWin(){
+    const {width, height} = screen.getPrimaryDisplay().workAreaSize
+    console.log(width, height)
+
     win = new BrowserWindow({
-        "width": 800,
-        "height": 500,
+        "width": width > 900 ? (width - 50) : 900,
+        "height": height > 500 ? (height - 50) : 500,
+        "minHeight":500,
+        "minWidth":900,
         "frame": false,
         "webPreferences": {
             "nodeIntegration": true,
@@ -12,8 +17,7 @@ function createMainWin(){
         }
     })
 
-    win.loadFile("Pages/Global.html")
-    win.webContents.openDevTools()
+    win.loadFile("Pages/MainPage.html")
 }
 
 // Start App
