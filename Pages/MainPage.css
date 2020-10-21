@@ -190,8 +190,11 @@ input{outline: none;}
 }#SongInfo:hover{background: #454545;transition: 200ms;}
 #SongInfoPicture{
     background: #F3F3F3;
-    min-height: 70px;
-    min-width: 70px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 70px;min-width: 70px;
+    max-height: 70px;max-width: 70px;
     border-radius: 10px;
     margin-right: 5px;
 }
@@ -212,7 +215,12 @@ input{outline: none;}
         padding: 10px;
     }
     #SongInfoText{color: #303030;}
-    #SongInfoPicture{background: #303030;}
+    #SongInfoPicture{
+        background: #303030;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
     #SongInfo:hover{
         background: #25ffb3;
         opacity: 0.9;
@@ -496,6 +504,9 @@ input{outline: none;}
 }
 .SongItemDisplay{
     background: #505050;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     width: 200px;
     height: 200px;
     border-radius: 15px 15px 0px 0px;
@@ -507,13 +518,14 @@ input{outline: none;}
     height: 100px;
     border-radius: 0px 0px 15px 15px;
     color: #303030;
+    transition: 200ms;
 }
 .SongItemInfo SongName{
     position: absolute;
     top: 8px;
     left: 8px;
 
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
 }
 .SongItemInfo OtherInfo{
@@ -521,5 +533,5 @@ input{outline: none;}
     top: 50px;
     left: 8px;
 
-    font-size: 18px;
+    font-size: 15px;
 }

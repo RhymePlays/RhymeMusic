@@ -10,5 +10,9 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^10.1.3"
+  },
+  "dependencies": {
+    "decompress": "^4.2.1",
+    "jszip": "^3.5.0"
   }
 }
