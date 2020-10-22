@@ -3,9 +3,8 @@ const fs = require('fs')
 const path = require('path')
 const decompress = require('decompress')
 const JSZip = require('jszip')
-// const { promises } = require('dns')
-// const { noAsar } = require('process')
-// const { file } = require('jszip')
+const { on } = require('process')
+const { app } = require('electron')
 
 // Variables
 var win = getCurrentWindow()
@@ -13,10 +12,13 @@ var variables = {
     "audioPlayer": new Audio,
     "audioPlaying": false,
     "controlsEnabled": false,
+    "suffleLoop": 0,
     "currentSongUrl": "",
     "currentSongLength": "",
-    "preSongId": "",
+    "prePlayList": "",
+    "preSongId":  "",
     "allMusics": [],
+    "currentPlaylistMusics": [],
     "appdataLoc": "Pages/appdata.json",
     "musicLoadFolder": "Pages/MusicLoadFolder/",
     "rhymeMusicsFolder": "Pages/Musics/",
@@ -62,7 +64,7 @@ function addMusic(){
                         var NewZipBuffer = await zipMaker.generateAsync({"type": "nodebuffer"})
                         fs.writeFileSync(variables.rhymeMusicsFolder+add_Num.toString()+".rhymemusic", NewZipBuffer)
 
-                        PopulateAllMusics()
+                        fetchAllMusic()
                     }
                 }
             }
@@ -99,30 +101,15 @@ function ToggleDrawerSection(id){
     }catch(e){null}
 }
 
-// PopulateSection
-function PopulatePlaylist(){
-    if (fs.existsSync(variables.appdataLoc)){
-        var appdata = JSON.parse(fs.readFileSync(variables.appdataLoc, "utf-8"))
-        
-        variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="Playlist0" class="DrawerSectionItem">All<div class="Spacer"></div><svg class="DrawerSectionPlay" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg></div>'
-        for(Item in appdata.playlists){
-            variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="Playlist'+appdata.playlists[Item].PlaylistItemID.toString()+'" class="DrawerSectionItem">'+appdata.playlists[Item].PlaylistItemName+'<div class="Spacer"></div><svg class="DrawerSectionPlay" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg></div>'
-        }
-    }else{fs.writeFileSync(variables.appdataLoc, "{}");PopulatePlaylist()}
-}
-PopulatePlaylist()
-
-// PopulateAllMusics
-async function PopulateAllMusics(){
+// PopulateMusics
+async function PopulateMusics(){
     variables.SongItemContainer.innerHTML='<div id="MainBodySongInfoSpacer"></div>'
-    variables.allMusics=[]
 
     if (fs.existsSync(variables.rhymeMusicsFolder)){
         if(fs.existsSync(variables.cacheFolder)){
             if(fs.existsSync(variables.musicsImageFolder)){
-                var allMusicsFetch = fs.readdirSync(variables.rhymeMusicsFolder)
-                for(MusicIndex in allMusicsFetch){variables.allMusics.push(allMusicsFetch[MusicIndex])}
                 for(MusicIndex in variables.allMusics){
+                    clearCache()
                     var rhymeMusic = fs.readFileSync(variables.rhymeMusicsFolder+variables.allMusics[MusicIndex])
                     await decompress(rhymeMusic, variables.cacheFolder)
 
@@ -133,43 +120,61 @@ async function PopulateAllMusics(){
                     variables.SongItemContainer.innerHTML = variables.SongItemContainer.innerHTML + '<div id="Song'+songData.id.toString()+'" class="SongItem"><div  onclick="loadAndPlaySong('+songData.id.toString()+')" class="SongItemAction"><svg class="SongItemPlay" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg></div><svg class="SongItemMore" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg><div class="SongItemLength">'+(songData.songLength? songData.songLength : "0:00")+'</div><div class="SongItemDisplay"></div><div class="SongItemInfo"><SongName>'+songData.displayName+'</SongName><br><OtherInfo>'+songData.artist+'<br>'+(songData.tags? songData.tags : 'N/A') +'</OtherInfo></div></div>'
                     document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemDisplay")[0].style.backgroundImage='url("MusicImages/'+songData.id+'.'+songData.imageFormat+'")'
                 }
-            }else{fs.mkdirSync(variables.musicsImageFolder);PopulateAllMusics()}
-        }else{fs.mkdirSync(variables.cacheFolder);PopulateAllMusics()}
-    }else{fs.mkdirSync(variables.rhymeMusicsFolder);PopulateAllMusics()}
+            }else{fs.mkdirSync(variables.musicsImageFolder);PopulateMusics()}
+        }else{fs.mkdirSync(variables.cacheFolder);PopulateMusics()}
+    }else{fs.mkdirSync(variables.rhymeMusicsFolder);PopulateMusics()}
+}
+function fetchAllMusic(){
+    variables.allMusics=[]
+    var allMusicsFetch = fs.readdirSync(variables.rhymeMusicsFolder)
+    for(MusicIndex in allMusicsFetch){variables.allMusics.push(allMusicsFetch[MusicIndex])}
+    PopulateMusics()
 }
 
-PopulateAllMusics()
-
-// VolumeProgress
-function refreshVolume(){
-    var SoundSliderValue = document.getElementById("SoundSlider").value
-    variables.audioPlayer.volume=parseInt(SoundSliderValue)/100
-    document.getElementById("SoundSlider").style.background = "linear-gradient(to right, #FB1E46 "+(SoundSliderValue).toString()+"%, #606060 "+(SoundSliderValue).toString()+"%)"
+// PopulatePlaylist
+function PopulatePlaylist(){
+    if (fs.existsSync(variables.appdataLoc)){
+        variables.PlaylistItemContainer.innerHTML=""
+        var appdata = JSON.parse(fs.readFileSync(variables.appdataLoc, "utf-8"))
+        
+        variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="PlaylistAll" onclick="playPlaylist(\'All\')" class="DrawerSectionItem">All</div>'
+        for(Item in appdata.playlists){
+            variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="Playlist'+Item.toString()+'" onclick="playPlaylist('+Item.toString()+')" class="DrawerSectionItem">'+appdata.playlists[Item].PlaylistItemName+'</div>'
+        }
+    }else{fs.writeFileSync(variables.appdataLoc, "{}");PopulatePlaylist()}
 }
+PopulatePlaylist()
 
-// MusicTimeLength
-function updateMusicTimeLength(){
-    document.getElementById("SongLength").innerHTML=formatSongLength(variables.audioPlayer.currentTime)+"</br>"+variables.currentSongLength
-}
+// PlaylistControl
+function setPlaylistActive(id){
+    try{
+        document.getElementById("Playlist"+variables.prePlayList.toString()).style.background="#606060"
+        document.getElementById("Playlist"+variables.prePlayList.toString()).style.color="#F3F3F3"
+    }catch(e){null}
+    document.getElementById("Playlist"+id.toString()).style.background="#25FFB1"
+    document.getElementById("Playlist"+id.toString()).style.color="#303030"
 
-// MusicProgress
-function refreshMusicProgressController(){
-    var MusicProgressValue = document.getElementById("MusicProgressBar").value
-    
-    document.getElementById("MusicProgressBar").style.background = "linear-gradient(to right, #FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
-    document.getElementById("MainActionProgress").style.background = "conic-gradient(#FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
-    updateMusicTimeLength()
+    variables.prePlayList=id
 }
-
-function updateMusicProgress(){
-    var MusicProgressValue = document.getElementById("MusicProgressBar").value
-    variables.audioPlayer.currentTime=((variables.audioPlayer.duration/500)*MusicProgressValue)
-    refreshMusicProgressController()
+function playPlaylist(id){
+    var appdata = JSON.parse(fs.readFileSync(variables.appdataLoc, "utf-8"))
+    if (id=="All"){
+        setPlaylistActive(id)
+        fetchAllMusic()
+    }else{
+        var playlistSongs = appdata.playlists[id].songsIDs
+        playlistSongs.sort();
+        if(playlistSongs.length!=0){
+            variables.allMusics=[]
+            for (Items in playlistSongs){
+                if(fs.existsSync(variables.rhymeMusicsFolder+playlistSongs[Items].toString()+".rhymemusic")){variables.allMusics.push(playlistSongs[Items].toString()+".rhymemusic")}
+            }
+            setPlaylistActive(id)
+            PopulateMusics()
+        }
+    }
 }
-variables.audioPlayer.addEventListener("timeupdate", function() {
-    document.getElementById("MusicProgressBar").value=(variables.audioPlayer.currentTime/variables.audioPlayer.duration)*500;
-    refreshMusicProgressController()
-})
+playPlaylist("All")
 
 // ToggleButtons
 function ToggleButtons(enable){
@@ -178,24 +183,20 @@ function ToggleButtons(enable){
         document.getElementById("NextButton").style.fill="#25FFB1"
         document.getElementById("MainActionButton").style.fill="#25FFB1"
         document.getElementById("Sound").style.fill="#25FFB1"
-        document.getElementById("SuffleButton").style.fill="#25FFB1"
-        document.getElementById("LoopButton").style.fill="#25FFB1"
         document.getElementById("ClosedCaptionsToggle").style.fill="#25FFB1"
         document.getElementById("MiniPlayerButton").style.fill="#25FFB1"
         document.getElementById("SongLength").style.display="block"
-
+        
         variables.controlsEnabled=true
     }else{
         document.getElementById("PreviousButton").style.fill="#303030"
         document.getElementById("NextButton").style.fill="#303030"
         document.getElementById("MainActionButton").style.fill="#505050"
         document.getElementById("Sound").style.fill="#606060"
-        document.getElementById("SuffleButton").style.fill="#606060"
-        document.getElementById("LoopButton").style.fill="#606060"
         document.getElementById("ClosedCaptionsToggle").style.fill="#303030"
         document.getElementById("MiniPlayerButton").style.fill="#303030"
         document.getElementById("SongLength").style.display="none"
-
+        
         variables.controlsEnabled=false
     }
 }
@@ -208,6 +209,10 @@ function clearCache(){
 function clearMusicLoadFolder(){
     var musicLoadFolderFiles = fs.readdirSync(variables.musicLoadFolder)
     for (fileIndex in musicLoadFolderFiles){fs.unlinkSync(variables.musicLoadFolder+musicLoadFolderFiles[fileIndex])}
+}
+function clearMusicsImageFolder(){
+    var musicsImageFolder = fs.readdirSync(variables.musicsImageFolder)
+    for (fileIndex in musicsImageFolder){fs.unlinkSync(variables.musicsImageFolder+musicsImageFolder[fileIndex])}
 }
 
 // openSongUrl
@@ -223,9 +228,39 @@ function refreshSongInfo(){
     document.getElementById("SongInfoGenre").innerHTML=songData.tags
 }
 
+// VolumeProgress
+function refreshVolume(){
+    var SoundSliderValue = document.getElementById("SoundSlider").value
+    variables.audioPlayer.volume=parseInt(SoundSliderValue)/100
+    document.getElementById("SoundSlider").style.background = "linear-gradient(to right, #FB1E46 "+(SoundSliderValue).toString()+"%, #606060 "+(SoundSliderValue).toString()+"%)"
+}
+
+// MusicTimeLength
+function updateMusicTimeLength(){document.getElementById("SongLength").innerHTML=formatSongLength(variables.audioPlayer.currentTime)+"</br>"+variables.currentSongLength}
+
+// MusicProgress
+function refreshMusicProgress(){
+    var MusicProgressValue = document.getElementById("MusicProgressBar").value
+    
+    document.getElementById("MusicProgressBar").style.background = "linear-gradient(to right, #FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
+    document.getElementById("MainActionProgress").style.background = "conic-gradient(#FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
+    updateMusicTimeLength()
+}
+
+function updateMusicProgressController(){
+    var MusicProgressValue = document.getElementById("MusicProgressBarControl").value
+    variables.audioPlayer.currentTime=((variables.audioPlayer.duration/500)*MusicProgressValue)
+    refreshMusicProgress()
+}
+variables.audioPlayer.addEventListener("timeupdate", function() {
+    document.getElementById("MusicProgressBar").value=(variables.audioPlayer.currentTime/variables.audioPlayer.duration)*500;
+    refreshMusicProgress()
+})
+
 // SongControl
 async function loadSong(id){
     if(fs.existsSync(variables.musicLoadFolder)){
+        clearCache()
         await decompress(variables.rhymeMusicsFolder+variables.allMusics[id], variables.cacheFolder)
 
         var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
@@ -238,32 +273,84 @@ async function loadSong(id){
         }catch(e){}
         document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemInfo")[0].style.background = "#25FFB1"
         document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemPlay")[0].style.fill = "#25FFB1"
-        document.getElementById("MainActionButton").innerHTML='<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 19c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2s-2 .9-2 2v10c0 1.1.9 2 2 2zm6-12v10c0 1.1.9 2 2 2s2-.9 2-2V7c0-1.1-.9-2-2-2s-2 .9-2 2z"/></svg>'
         variables.preSongId=songData.id
-        ToggleButtons(true)
-
-        clearMusicLoadFolder()
-
+        
+        try{clearMusicLoadFolder()}catch(e){null}
         var songBinary = fs.readFileSync(variables.cacheFolder+"music."+songData.musicFormat)
         fs.writeFileSync(variables.musicLoadFolder+songData.id.toString()+"."+songData.musicFormat, songBinary)
-
+        
         variables.audioPlayer.src="MusicLoadFolder/"+songData.id.toString()+"."+songData.musicFormat;
+        ToggleButtons(true)
     }else{fs.mkdirSync(variables.musicLoadFolder);loadSong(id)}
 }
-async function loadAndPlaySong(id){await loadSong(id);playSong();refreshSongInfo()}
-function playSong(){variables.audioPlayer.play();variables.audioPlaying=true}
-function pauseSong(){variables.audioPlayer.pause();variables.audioPlaying=false}
+async function loadAndPlaySong(id){await loadSong(id);variables.audioPlayer.play();refreshSongInfo()}
+
+// Audio on Pause and Play
+variables.audioPlayer.addEventListener("pause", ()=>{
+    variables.audioPlaying=false
+    document.getElementById("MainActionButton").innerHTML='<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg>'
+})
+variables.audioPlayer.addEventListener("play", ()=>{
+    variables.audioPlaying=true
+    document.getElementById("MainActionButton").innerHTML='<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 19c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2s-2 .9-2 2v10c0 1.1.9 2 2 2zm6-12v10c0 1.1.9 2 2 2s2-.9 2-2V7c0-1.1-.9-2-2-2s-2 .9-2 2z"/></svg>'
+})
+
+// MainAction, Next, Previous
 function mainAction(){
     if(variables.controlsEnabled){
-        if(variables.audioPlaying){
-            pauseSong()
-            document.getElementById("MainActionButton").innerHTML='<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg>'
+        if(variables.audioPlaying){variables.audioPlayer.pause()}
+        else{variables.audioPlayer.play()}
+    }
+}
+function playNextSong(){
+    let nextSongId=variables.preSongId+1
+    if(variables.controlsEnabled){
+        if(variables.allMusics.length > nextSongId){
+            loadAndPlaySong(nextSongId)
         }else{
-            playSong()
-            document.getElementById("MainActionButton").innerHTML='<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 19c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2s-2 .9-2 2v10c0 1.1.9 2 2 2zm6-12v10c0 1.1.9 2 2 2s2-.9 2-2V7c0-1.1-.9-2-2-2s-2 .9-2 2z"/></svg>'
+            loadAndPlaySong(0)
         }
     }
 }
+function playPreviousSong(){
+    let preSongId=variables.preSongId-1
+    if(variables.controlsEnabled){
+        if(0 <= preSongId){
+            loadAndPlaySong(preSongId)
+        }else{
+            loadAndPlaySong(variables.allMusics.length-1)
+        }
+    }
+}
+
+// ToggleSuffleLoop
+function toggleSuffleLoop(){
+    if(variables.suffleLoop==1){
+        variables.suffleLoop=2
+        document.getElementById("LoopButton").style.fill="#25FFB1"
+        document.getElementById("SuffleButton").style.fill="#606060"
+    }else if(variables.suffleLoop==2){
+        variables.suffleLoop=0
+        document.getElementById("LoopButton").style.fill="#606060"
+        document.getElementById("SuffleButton").style.fill="#606060"
+
+    }else{
+        variables.suffleLoop=1
+        document.getElementById("SuffleButton").style.fill="#25FFB1"
+        document.getElementById("LoopButton").style.fill="#606060"
+    }
+}
+
+// onMusicEnd
+variables.audioPlayer.addEventListener("ended", ()=>{
+    variables.audioPlayer.pause();
+    if(variables.suffleLoop==1){
+        playNextSong()
+    }else if(variables.suffleLoop==2){
+        loadAndPlaySong(variables.preSongId)
+    }else{null}
+})
+
 
 // FormatedMusicLength
 function formatSongLength(durationRaw){return Math.floor(durationRaw/60).toString()+":"+Math.floor(durationRaw-(Math.floor(durationRaw/60)*60)).toString()}

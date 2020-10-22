@@ -228,6 +228,7 @@ input{outline: none;}
     #MainBody{margin-bottom: 95px;}
     #MainBody::-webkit-scrollbar-track{border-radius: 15px;}
 }
+
 #MusicProgressBar{
     position: absolute;
     top: -2px;
@@ -236,15 +237,22 @@ input{outline: none;}
     height: 5px;
     width: 100%;
     background: linear-gradient(to right, #FB1E46 0%, #505050 0%);
-}
-#MusicProgressBar::-webkit-slider-thumb{
+}#MusicProgressBar::-webkit-slider-thumb{display: none;}
+#MusicProgressBarControl{
+    position: absolute;
+    top: -2px;
+
+    -webkit-appearance: none;
+    height: 5px;
+    width: 100%;
+    background: transparent;
+}#MusicProgressBarControl::-webkit-slider-thumb{
     -webkit-appearance: none;
     height: 5px;
     width: 5px;
-    border-radius: 10px;
-    background: #25FFB1;
-    transition: 150ms;
-}#MusicProgressBar::-webkit-slider-thumb:hover{box-shadow: 0 0 0 10px #25ffb330;transition: 200ms;}
+    background: transparent;
+}
+
 #PreviousButton{
     background: transparent;
     width: 50px;
@@ -301,13 +309,13 @@ input{outline: none;}
     height: 50px;
     border-radius: 50px;
     margin-right: 10px;
-    transition: 150ms;
     fill: #606060;
+    transition: 150ms;
     
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-}#SuffleOrLoopDiv svg{margin-top: 5px; height: 30px; width: 30px;}
+}#SuffleOrLoopDiv svg{margin-top: 5px; height: 30px; width: 30px;transition: 200ms;}
 #SuffleOrLoopDiv:hover{background: #353535;transition: 200ms;}
 #SoundControlDiv{
     background: #303030;
