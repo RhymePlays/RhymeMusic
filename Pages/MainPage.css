@@ -108,6 +108,10 @@ input{outline: none;}
     height: 30px;
     padding-top: 5px;
 }
+.DrawerSectionContainer{
+    height: 84%;
+    overflow-y: auto;
+}
 .DrawerSection{
     margin-top: 10px;
     padding-bottom: 10px;
@@ -222,7 +226,7 @@ input{outline: none;}
         background-size: cover;
     }
     #SongInfo:hover{
-        background: #25ffb3;
+        background: #25FFB1;
         opacity: 0.9;
     }
     #MainBody{margin-bottom: 95px;}
@@ -355,7 +359,7 @@ input{outline: none;}
     border-radius: 10px;
     background: #25FFB1;
     transition: 150ms;
-}#SoundSlider::-webkit-slider-thumb:hover{box-shadow: 0 0 0 10px #25ffb330;transition: 200ms;}
+}#SoundSlider::-webkit-slider-thumb:hover{box-shadow: 0 0 0 10px #25FFB130;transition: 200ms;}
 #SoundControlDiv:hover #SoundSlider{display: block;}
 #ClosedCaptionsToggle{
     background: transparent;
@@ -467,6 +471,10 @@ input{outline: none;}
     flex-wrap: wrap;
 }
 
+/* OverPanel */
+
+
+
 /* SongItem */
 .SongItem{
     position: relative;
@@ -542,4 +550,15 @@ input{outline: none;}
     left: 8px;
 
     font-size: 15px;
+}
+
+/* Over Page */
+#OverPage{
+    display: none;
+    position: absolute;
+    top: 40px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #303030;
 }

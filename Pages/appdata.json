@@ -1,5 +1,7 @@
 {
     "playlists": [
-        {"PlaylistItemName": "AllCustomBaby", "songsIDs": [0, 1, 3, 4]}
+        {"PlaylistItemName": "List 1", "songsIDs": [0, 1, 3]},
+        {"PlaylistItemName": "Gaming List", "songsIDs": [0, 2, 3]},
+        {"PlaylistItemName": "List 3", "songsIDs": [0, 1, 2]}
     ]
 }

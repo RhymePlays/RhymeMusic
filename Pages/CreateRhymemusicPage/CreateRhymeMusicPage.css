@@ -1,0 +1,119 @@
+/* Global */
+html{height: 100%;/*FooterStickTrick*/}
+body{
+    height: 100%;
+    font-family: Montserrat, Roboto, Arial, Helvetica, sans-serif;
+    background: #303030;
+    margin: 0;
+    cursor: default;
+    color: #F3F3F3;
+
+    display: flex;/*FooterStickTrick*/
+    flex-direction: column;/*FooterStickTrick*/
+    min-height: 100%;/*FooterStickTrick*/
+}
+
+input{outline: none;}
+::selection {background: transparent;}
+
+::-webkit-scrollbar{height: 5px;}
+::-webkit-scrollbar-thumb{background: #606060;border-radius: 15px;}
+::-webkit-scrollbar-track{background:  #404040;}
+
+/* TitleBar */
+#TitleBar svg{height: 40px; width: 40px;}
+#TitleBar{
+    background: #505050;
+    height: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+}
+#CloseWinButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #FB1E46;
+    fill: #303030;
+    min-height: 40px;max-height: 40px;
+    min-width: 40px;max-width: 40px;
+    transition: 150ms;
+}#CloseWinButton:hover{filter: brightness(75%);transition: filter 200ms}
+#TitleBarSpacer{
+    display: flex;
+    align-items: center;
+    padding: 0px 10px;
+
+    width: 100%;
+    -webkit-app-region: drag; /*Makes Drag Possible*/
+}
+
+/* Body */
+#MainBody{
+    width: 100%;
+    height: 100%;
+}
+
+#SelectImageContainer{
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}
+#SelectImageButton{
+    background: #505050;
+    height: 50px;
+    width: 100%;
+    padding: 0px 15px;
+    margin-right: 10px;
+    border-radius: 10px;
+    transition: 150ms;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#SelectImageButton:hover{filter: brightness(0.9);transition: 200ms;}
+#ImageView{
+    min-height: 50px;max-height: 50px;
+    min-width: 50px;max-width: 50px;
+    border-radius: 10px;
+    background: #505050;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#EntryHolder{margin: 0px 23px 0px 13px;}
+.RhymeMusicEntryDiv{
+    height: 50px;
+    width: 100%;
+    margin-top: 20px;
+}
+.RhymeMusicEntry{
+    height: 100%;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    box-shadow: #505050 0px 0px 0px 4px;
+    margin: 0;
+    padding: 0px 5px;
+    background: #303030;
+    color: #F3F3F3;
+    font-size: 25px;
+}
+
+#CreateButton{
+    width: 100%;
+    height: 100px;
+    position: absolute;
+    bottom: 0;
+    background: #25FFB1;
+    color: #303030;
+    font-size: 30px;
+    border-radius: 15px 15px 0px 0px;
+    transition: 150ms;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}#CreateButton:hover{filter: brightness(0.8);transition: 200ms;}
