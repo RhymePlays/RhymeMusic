@@ -13,8 +13,10 @@ var variables = {
     "audioPlaying": false,
     "controlsEnabled": false,
     "suffleLoop": 0,
+    "currentSongName": "",
     "currentSongUrl": "",
     "currentSongLength": "",
+    "currentSongLyrics": null,
     "prePlayList": "",
     "preSongId":  "",
     "allMusics": [],
@@ -43,6 +45,7 @@ function addMusic(){
         }
         else if ([".mp3", ".wav", ".m4a", ".aac", ".ogg", ".webm"].includes(musicPath.ext)){
             ipcRenderer.send("createAddWindow", musicRawPath)
+            ipcRenderer.on("getAddWinReturnedFile", (event, arg)=>{saveRhymeMusicFile(arg)})
         }
     }catch(e){null}
 }
@@ -128,6 +131,8 @@ async function loadSong(id){
         var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
         variables.currentSongUrl= songData.url? songData.url : ""
         variables.currentSongLength= songData.songLength
+        variables.currentSongLyrics= songData.lyrics
+        variables.currentSongName= songData.displayName
         
         try{
             document.getElementById("Song"+variables.preSongId.toString()).getElementsByClassName("SongItemInfo")[0].style.background = "#1BADFF"
@@ -226,6 +231,18 @@ function removeFromPlaylist(songId, playlistId){
     fs.writeFileSync(variables.appdataLoc, JSON.stringify(appdata))
     showSongMorePlaylistOverPage(songId)
 }
+
+// Get Song lyrics
+async function getSongLyricsById(id){
+    await extractRhymeMusicFile(variables.rhymeMusicsFolder+id.toString()+".rhymemusic")
+    var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json"))
+
+    if(songData.lyrics==undefined){
+        return [songData.displayName, null]
+    }else{
+        return [songData.displayName, songData.lyrics]
+    }
+}
 /* dataControl BackEnd Side End */
 
 
@@ -240,8 +257,12 @@ function openSongUrl(){if (variables.currentSongUrl!=""){require("electron").she
 // SetSongInfo
 function refreshSongInfo(){
     var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
-    var songImageData=fs.readFileSync(variables.cacheFolder+"image."+songData.imageFormat)
-    document.getElementById("SongInfoPicture").style.backgroundImage='url("MusicImages/'+songData.id+'.'+songData.imageFormat+'")'
+    // try{var songImageData=fs.readFileSync(variables.cacheFolder+"image."+songData.imageFormat)}catch(e){null}
+    if(fs.existsSync(variables.musicsImageFolder+songData.id+'.'+songData.imageFormat)){
+        document.getElementById("SongInfoPicture").style.backgroundImage='url("MusicImages/'+songData.id+'.'+songData.imageFormat+'")'
+    }else{
+        document.getElementById("SongInfoPicture").style.backgroundImage="none"
+    }
     document.getElementById("SongInfoName").innerHTML=songData.displayName
     document.getElementById("SongInfoArtist").innerHTML=songData.artist
     document.getElementById("SongInfoGenre").innerHTML=songData.tags
@@ -330,7 +351,7 @@ async function PopulateMusics(){
                     }catch(e){null}
 
                     variables.SongItemContainer.innerHTML = variables.SongItemContainer.innerHTML + '<div id="Song'+songData.id.toString()+'" class="SongItem"><div  onclick="loadAndPlaySong('+songData.id.toString()+')" class="SongItemAction"><svg class="SongItemPlay" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg></div><svg class="SongItemMore" onclick="showSongMoreOverPage('+songData.id.toString()+')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg><div class="SongItemLength">'+(songData.songLength? songData.songLength : "0:00")+'</div><div class="SongItemDisplay"></div><div class="SongItemInfo"><SongName>'+songData.displayName+'</SongName><br><OtherInfo>'+songData.artist+'<br>'+(songData.tags? songData.tags : 'N/A') +'</OtherInfo></div></div>'
-                    document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemDisplay")[0].style.backgroundImage='url("MusicImages/'+songData.id+'.'+songData.imageFormat+'")'
+                    songData.imageFormat==null? null:document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemDisplay")[0].style.backgroundImage='url("MusicImages/'+songData.id+'.'+songData.imageFormat+'")'
                 }
             }else{fs.mkdirSync(variables.musicsImageFolder);PopulateMusics()}
         }else{fs.mkdirSync(variables.cacheFolder);PopulateMusics()}
@@ -413,9 +434,9 @@ async function showSongMoreOverPage(id){
             <div id="SongMoreOverlayDisplay"></div>
             <div id="SongMoreOverlayInfo">
                 `+songData.displayName+`<br>
-                `+songData.artist+`<br><br>
-                Tags: `+songData.tags+`<br>
-                URL: `+songData.url.split("https://")[1]+`<br>
+                `+(songData.artist || "N/A")+`<br><br>
+                Tags: `+(songData.tags || "N/A")+`<br>
+                URL: `+(songData.url==null? "N/A" : songData.url.split("https://")[1])+`<br>
                 Length: `+songData.songLength+`<br>
                 ID: `+songData.id+`
             </div>
@@ -425,6 +446,7 @@ async function showSongMoreOverPage(id){
             <div id="CloseSongMoreOverlay" onclick="closeOverPage()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18.3 5.71c-.39-.39-1.02-.39-1.41 0L12 10.59 7.11 5.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L10.59 12 5.7 16.89c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L12 13.41l4.89 4.89c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z"/></svg></div>
             <div id="SongMoreOverlayItemContainer">
                 <div class="SongMoreOverlayItem" id="SongMoreOverlayItemAddtoPlaylist" onclick="showSongMorePlaylistOverPage(`+id+`)">Edit Playlists<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M18 13h-5v5c0 .55-.45 1-1 1s-1-.45-1-1v-5H6c-.55 0-1-.45-1-1s.45-1 1-1h5V6c0-.55.45-1 1-1s1 .45 1 1v5h5c.55 0 1 .45 1 1s-.45 1-1 1z"></path></svg></div>
+                <div class="SongMoreOverlayItem" onclick="openSongLyricsById(`+id+`)">Open Lyrics</div>
                 <div class="SongMoreOverlayItem" onclick="exportSong(`+id+`)">Export Song</div>
                 
                 <div class="SongMoreOverlayItem" id="SongMoreOverlayItemDeleteSong" onclick="deleteSong(`+id+`)">Delete Song<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18 13H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"/></svg></div>
@@ -432,7 +454,7 @@ async function showSongMoreOverPage(id){
         </div>
     </div>`
 
-    document.getElementById("SongMoreOverlayDisplay").style.backgroundImage = "url("+"MusicImages/"+id.toString()+"."+songData.imageFormat+")"
+    songData.imageFormat==null? null : document.getElementById("SongMoreOverlayDisplay").style.backgroundImage = "url("+"MusicImages/"+id.toString()+"."+songData.imageFormat+")"
     document.getElementById("OverPage").style.display = "flex"
 }
 
@@ -524,6 +546,31 @@ function showBugReport(){
         We'll try our best to fix the bug.
     </div>`
     
+    document.getElementById("OverPage").style.display = "flex"
+}
+function openCurrentSongLyrics(){
+    var lyrics=variables.currentSongLyrics
+    if (lyrics!=null){
+        document.getElementById("OverPage").innerHTML=`
+        <div id="TextOverPage">
+            <div id="CloseTextOverlay" onclick="closeOverPage()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18.3 5.71c-.39-.39-1.02-.39-1.41 0L12 10.59 7.11 5.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L10.59 12 5.7 16.89c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L12 13.41l4.89 4.89c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z"/></svg></div>
+            <div id="TextOverPageTitle">Lyrics.</div><br>
+            <div style="text-align: center;">`+'<h2>'+variables.currentSongName+'</h2>'+lyrics+`</div>
+        </div>`
+        document.getElementById("OverPage").style.display = "flex"
+    }
+}
+async function openSongLyricsById(id){
+    var returnedSongData= await getSongLyricsById(id)
+    var songName= returnedSongData[0]
+    var lyrics= returnedSongData[1]
+
+    document.getElementById("OverPage").innerHTML=`
+    <div id="TextOverPage">
+        <div id="CloseTextOverlay" onclick="closeOverPage()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18.3 5.71c-.39-.39-1.02-.39-1.41 0L12 10.59 7.11 5.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L10.59 12 5.7 16.89c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L12 13.41l4.89 4.89c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z"/></svg></div>
+        <div id="TextOverPageTitle">Lyrics.</div><br>
+        <div style="text-align: center;">`+'<h2>'+songName+'</h2>'+(lyrics? lyrics:"No Lyrics Found!")+`</div>
+    </div>`
     document.getElementById("OverPage").style.display = "flex"
 }
 /* OverPage Side Start */

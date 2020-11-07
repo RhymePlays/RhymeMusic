@@ -24,8 +24,8 @@ function createMainWin(){
 function createAddWin(){
     var addWin = new BrowserWindow({
         "width": 400,
-        "height": 600,
-        "minHeight": 500,
+        "height": 625,
+        "minHeight": 625,
         "minWidth": 300,
         "frame": false,
         "webPreferences": {
@@ -33,15 +33,20 @@ function createAddWin(){
             "enableRemoteModule": true
         }
     })
-    
+
     addWin.loadFile("Pages/CreateRhymemusicPage/CreateRhymemusicPage.html")
     addWin.webContents.openDevTools()
 }
 
-ipcMain.on("createAddWindow", (event, arg)=>{
+ipcMain.on("createAddWindow", (mainPageEvent, arg)=>{
     createAddWin()
+    
     ipcMain.on("getAddWin", (event)=>{
         event.sender.send("addWinMusicRawPath", arg)
+    })
+
+    ipcMain.on("requestedFileReady", (event, arg)=>{
+        mainPageEvent.sender.send("getAddWinReturnedFile", arg)
     })
 })
 

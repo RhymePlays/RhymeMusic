@@ -39,21 +39,33 @@ function selectImageButton(){
 }
 
 async function createButton(){
-    const zipMaker = new JSZip();
-    var songData={
-        "displayName": document.getElementById("MusicNameEntry").value,
-        "artist": document.getElementById("ArtistEntry").value==""? null: document.getElementById("ArtistEntry").value,
-        "url": document.getElementById("URLEntry").value==""? null: document.getElementById("URLEntry").value,
-        "tags": document.getElementById("TagsEntry").value==""? null: document.getElementById("TagsEntry").value.split(" "),
-        "musicFormat": vars.musicPath.ext.split(".")[1],
-        "imageFormat": vars.imagePath? vars.imagePath.ext.split(".")[1]: null,
+    if(document.getElementById("MusicNameEntry").value!=""){
+        const zipMaker = new JSZip();
+        var songData={
+            "displayName": document.getElementById("MusicNameEntry").value,
+            "artist": document.getElementById("ArtistEntry").value==""? null: document.getElementById("ArtistEntry").value,
+            "url": document.getElementById("URLEntry").value==""? null: document.getElementById("URLEntry").value,
+            "tags": document.getElementById("TagsEntry").value==""? null: document.getElementById("TagsEntry").value.split(" "),
+            "lyrics": document.getElementById("LyricsEntry").value==""? null: document.getElementById("LyricsEntry").value,
+            "musicFormat": vars.musicPath.ext.split(".")[1],
+            "imageFormat": vars.imagePath? vars.imagePath.ext.split(".")[1]: null,
+        }
+    
+        zipMaker.file("data.json", JSON.stringify(songData))
+        vars.imageDataInBin==null? null: zipMaker.file("image."+songData.imageFormat, vars.imageDataInBin)
+        zipMaker.file("music."+songData.musicFormat, vars.musicDataInBin)
+    
+        var NewZipData = await zipMaker.generateAsync({"type": "nodebuffer"})
+        fs.writeFileSync(vars.musicPath.dir+"/"+songData.displayName+".rhymemusic", NewZipData)
+    
+        ipcRenderer.send("requestedFileReady", vars.musicPath.dir+"/"+songData.displayName+".rhymemusic")
+        closeWindow()
+    }else{
+        document.getElementById("CreateButton").style.background = "#FB1E46"
+        document.getElementById("CreateButton").style.color = "#F3F3F3"
+        setTimeout(()=>{
+            document.getElementById("CreateButton").style.background = "#25FFB1"
+            document.getElementById("CreateButton").style.color = "#303030"
+        }, 2500)
     }
-
-    zipMaker.file("data.json", JSON.stringify(songData))
-    vars.imageDataInBin==null? null: zipMaker.file("image."+songData.imageFormat, vars.imageDataInBin)
-    zipMaker.file("music."+songData.musicFormat, vars.musicDataInBin)
-
-    var NewZipData = await zipMaker.generateAsync({"type": "nodebuffer"})
-    fs.writeFileSync(vars.musicPath.dir+"/"+songData.displayName+".rhymemusic", NewZipData)
-    closeWindow()
 }
