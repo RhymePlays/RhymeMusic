@@ -11,6 +11,7 @@
 - Add a way **hide empty** or to possibily **Delete** a playlist.
 - Add **Searching** ability.
 - Add **Shortcut**.
+- Add **Clear Cache** on program exit.
 - Add Functionality to **MiniPlayer**.
 - Handle **System Arguments** for playing and adding music.
 - Control Song with **System Media Controller**.
@@ -24,6 +25,8 @@
 - Make better **Report** and **Credit** Page W/Social Media Links.
 - Add **Setting** Page.
 - Add Some Sort of **Help** Page.
+- Make a **Easter Egg**.
+- no **console** access warning.
 
 - Future Optimizations
     - when populating musics instead of loading it w\ music in it just decode "Data json" & "image.*". 

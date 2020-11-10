@@ -18,13 +18,14 @@ var variables = {
     "currentSongLength": "",
     "currentSongLyrics": null,
     "prePlayList": "",
-    "preSongId":  "",
+    "preSongId": "",
     "allMusics": [],
     "appdataLoc": "Pages/appdata.json",
     "musicLoadFolder": "Pages/MusicLoadFolder/",
     "rhymeMusicsFolder": "Pages/Musics/",
     "cacheFolder": "Pages/Cache/",
     "musicsImageFolder": "Pages/MusicImages/",
+    "customModulesFolder": "Pages/CustomModules/",
     "PlaylistItemContainer": document.getElementById("PlaylistItems"),
     "SongItemContainer": document.getElementById("MainBody"),
 };
@@ -49,6 +50,19 @@ function addMusic(){
         }
     }catch(e){null}
 }
+
+
+
+
+
+
+/* ipc Side Start */
+function openCurrentSongInMiniPlayer(){
+    if(variables.controlsEnabled){
+        ipcRenderer.send("createMiniWindow", {"data":"here"})
+    }
+}
+/* ipc Side Start */
 
 
 
@@ -489,6 +503,31 @@ function showSongMorePlaylistOverPage(songId){
     document.getElementById("OverPage").style.display = "flex"
 }
 
+function showSettingsOverPage(){
+    document.getElementById("OverPage").innerHTML=`
+    <div id="TextOverPage">
+        <div id="CloseTextOverlay" onclick="closeOverPage()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18.3 5.71c-.39-.39-1.02-.39-1.41 0L12 10.59 7.11 5.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L10.59 12 5.7 16.89c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L12 13.41l4.89 4.89c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z"/></svg></div>
+        <div id="TextOverPageTitle">Settings.</div><br>
+
+        This is supposed to be the Settings page. I haven't finished the settings page yet. (And i dont know what to put here) Sooo, enjoy reading the docs and learn how to use RhymeMusic.<br><br>
+        
+        <b>(1) This is a music player, to listen to music using this program, first you gotta import them. (RhymeMusic uses a custom music format [.rhymemusic], hence the importing process is important)<br>
+        How to import music:</b>
+        1. Click the <b>Plus(+) button</b> located at the very top-left corner of the program.<br>
+        2. Select the music file that you wanna import. If the file is ".rhymemusic" format, it will import without any additional steps. But if the file format is any other audio format, you'll have to set it up.
+        You have to add a title. You can also add a picture, artist, tags, source url and lyrics as shown at the picture below.<br>
+        <img src="Assets/CreateRhymemusicDemo.png" alt="" style="min-width: 50px;max-width: 200px;"><br><br>
+
+        <b>(2) When you've got some musics imported, select the "All" playlist if it isn't selected already. Click the play icon on the song item, it will start playing.</b> You can control the song from the bottom controller.<br>
+        Try out each option (E.G.: Loop/Suffle, Closed Captions/Lyrics, Play/Pause, The seekbar, Clicking the song name to redirect to source, etc), there's noting to worry about and it doesn't save your preference.<br><br>
+
+        <b>(3) To view more info about a song press the three dot on a song item.</b> It will show you all info about the song. And it will also allow you delete, export, view lyrics and add it to Playlists.
+
+        <h3>Disclamer: <b>This is just a developer preview!</b> The above mentioned functions work properly, but some features like the search and miniplayer currently just dont work. A lot of work needs to be done. The release version of the app will be a lot more polished.</h3> 
+        
+    </div>`
+    document.getElementById("OverPage").style.display = "flex"
+}
 
 function showAbout(){
     document.getElementById("OverPage").innerHTML=`
@@ -497,8 +536,7 @@ function showAbout(){
         <div id="TextOverPageTitle">About.</div><br>
 
         RhymeMusic is a product of Isfar Tausif Rhyme.<br><br>
-        RhymeMusic is a simple music player program, designed and developed entirely by Isfar Tausif Rhyme.
-        Isfar Tausif Rhyme is the sole developer behind RhymeMusic. The RhymeMusic Project, was first started in "<b>Thu Oct 15 12:38:18 2020 +0600</b>". Electron framework used in the making of this program
+        RhymeMusic is a simple music player program. The RhymeMusic Project, was first started in "<b>Thu Oct 15 12:38:18 2020 +0600</b>". ElectronJS framework used in the making of this program
         Third-Party resources like <b>Material.io</b> icons and others used.<br>
         
         <b><h3>Notable features of RhymeMusic:</h3></b>
@@ -515,9 +553,11 @@ function showAbout(){
 
         For more information contact <a href="mailto:isfartousif2@gmail.com">isfartousif2@gmail.com</a>.<br><br>
 
-        No one but you are responsible for the usage of this program. <br>
-        Bug fixes and new stuff are being added frequently.<br>
-        RhymeMusic 2020.
+        No one but you are responsible for the usage of this program.<br>
+        Bug fixes and new stuff are being added frequently.<br><br>
+
+        RhymeMusic V_0.1.0 (DevBuild)<br>
+        Copyright © 2019 Isfar Tausif Rhyme. All rights reserved.
     </div>`
     document.getElementById("OverPage").style.display = "flex"
 }
@@ -527,8 +567,15 @@ function showCredits(){
         <div id="CloseTextOverlay" onclick="closeOverPage()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18.3 5.71c-.39-.39-1.02-.39-1.41 0L12 10.59 7.11 5.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L10.59 12 5.7 16.89c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L12 13.41l4.89 4.89c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z"/></svg></div>
         <div id="TextOverPageTitle">Credits.</div><br>
 
-        Designer: Isfar Tausif Rhyme<br>
-        Coder: Isfar Tausif Rhyme.
+        Isfar Tausif Rhyme is the sole developer behind RhymeMusic
+        ElectronJS Framework and Material.io icons used.
+
+        <h4>Follow my Social Medias.</h4>
+        Instagram: <a target="blank" href="https://www.instagram.com/isfar_tausif_">https://www.instagram.com/isfar_tausif_<br></a>
+        Twitter: <a target="blank" href="https://twitter.com/IsfarTousif">https://twitter.com/IsfarTousif<br></a>
+        Youtube: <a target="blank" href="https://www.youtube.com/channel/UC6w168vbcWnU5WE_mHj2RiQ?sub_confirmation=1">https://www.youtube.com/channel/UC6w168vbcWnU5WE_mHj2RiQ?sub_confirmation=1<br></a>
+        GitHub: <a target="blank" href="https://github.com/RhymePlays">https://github.com/RhymePlays<br></a>
+        Twitch: <a target="blank" href="https://www.twitch.tv/isfar_tausif">https://www.twitch.tv/isfar_tausif<br></a>
     </div>`
 
     document.getElementById("OverPage").style.display = "flex"

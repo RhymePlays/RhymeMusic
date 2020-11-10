@@ -35,9 +35,8 @@ function createAddWin(){
     })
 
     addWin.loadFile("Pages/CreateRhymemusicPage/CreateRhymemusicPage.html")
-    addWin.webContents.openDevTools()
+    // addWin.webContents.openDevTools()
 }
-
 ipcMain.on("createAddWindow", (mainPageEvent, arg)=>{
     createAddWin()
     
@@ -50,7 +49,35 @@ ipcMain.on("createAddWindow", (mainPageEvent, arg)=>{
     })
 })
 
+
+// Miniplayer Window
+function createMiniplayerWin(){
+    var miniWin = new BrowserWindow({
+        "width": 400,
+        "height": 480,
+        "minWidth": 400,
+        "minHeight": 480,
+        "frame": false,
+        "webPreferences": {
+            "nodeIntegration": true,
+            "enableRemoteModule": true
+        }
+    })
+
+    miniWin.loadFile("Pages/MiniPage/MiniPage.html")
+}
+ipcMain.on("createMiniWindow", (mainPageEvent, arg)=>{
+    createMiniplayerWin()
+
+    ipcMain.on("getMiniWin", (event)=>{
+        event.sender.send("miniWinPlayData", arg)
+    })
+})
+
+
+
 // Start App
+// app.on("ready", createMiniplayerWin)
 app.on("ready", createMainWin)
 
 // Stop App (Not necessary)

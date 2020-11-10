@@ -1,3 +1,11 @@
+const {getCurrentWindow} = require('electron').remote
+
+// Variables
+var win = getCurrentWindow()
+
+// Functions
+function MaximizePlayer(){win.close()}
+
 function refreshMusicProgressController(){
     MusicProgressValue = document.getElementById("MiniMusicProgressBar").value
     document.getElementById("MiniMusicProgressBar").style.background = "linear-gradient(to right, #FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
