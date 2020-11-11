@@ -35,4 +35,4 @@
 - Make a way to update to newer versions
 - Make **failsafe** music extact/file-read system *(BUGFIX)*
 ---
-### Total Bugs Fixed: `5+`
+### Total Bugs Fixed: `12+`

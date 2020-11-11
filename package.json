@@ -4,12 +4,28 @@
   "description": "Music/Audio playing app.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "buildApp": "electron-builder"
+  },
+  "build": {
+    "appId": "rhymemusic",
+    "win":{
+      "target": ["nsis"],
+      "icon": "Icon.ico"
+    },
+    "nsis": {
+      "installerIcon": "Icon.ico",
+      "uninstallerIcon": "Icon.ico",
+      "uninstallDisplayName":"Uninstall RhymeMusic",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "author": "Isfar Tausif Rhyme",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^10.1.3"
+    "electron": "^10.1.3",
+    "electron-builder": "^22.9.1"
   },
   "dependencies": {
     "decompress": "^4.2.1",

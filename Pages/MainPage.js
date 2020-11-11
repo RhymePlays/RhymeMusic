@@ -1,4 +1,4 @@
-const {BrowserWindow, getCurrentWindow, dialog} = require('electron').remote
+const {BrowserWindow, getCurrentWindow, dialog, app} = require('electron').remote
 const {ipcRenderer} = require('electron')
 const fs = require('fs')
 const path = require('path')
@@ -20,12 +20,11 @@ var variables = {
     "prePlayList": "",
     "preSongId": "",
     "allMusics": [],
-    "appdataLoc": "Pages/appdata.json",
-    "musicLoadFolder": "Pages/MusicLoadFolder/",
-    "rhymeMusicsFolder": "Pages/Musics/",
-    "cacheFolder": "Pages/Cache/",
-    "musicsImageFolder": "Pages/MusicImages/",
-    "customModulesFolder": "Pages/CustomModules/",
+    "appdataLoc": app.getPath("documents")+"\\RhymeMusic.json",
+    "musicLoadFolder": app.getPath('userData')+"\\MusicLoadFolder\\",
+    "rhymeMusicsFolder": app.getPath("music")+"\\RhymeMusic\\",
+    "cacheFolder": app.getPath("userData")+"\\Cache\\",
+    "musicsImageFolder": (app.getPath("userData")+"\\MusicImages\\").replace(/\\/g, "/"),
     "PlaylistItemContainer": document.getElementById("PlaylistItems"),
     "SongItemContainer": document.getElementById("MainBody"),
 };
@@ -84,7 +83,7 @@ async function saveRhymeMusicFile(musicRawPath){
             // Editing Song Data
             var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
             songData.id=variables.currentSaveRhymeMusicFileID
-            songData.songLength= await getSongLength("Cache/music."+songData.musicFormat)
+            songData.songLength= await getSongLength(variables.cacheFolder+"music."+songData.musicFormat)
             fs.writeFileSync(variables.cacheFolder+"data.json", JSON.stringify(songData))
 
             // Saving .rhymemusic File
@@ -160,7 +159,7 @@ async function loadSong(id){
         var songBinary = fs.readFileSync(variables.cacheFolder+"music."+songData.musicFormat)
         fs.writeFileSync(variables.musicLoadFolder+songData.id.toString()+"."+songData.musicFormat, songBinary)
         
-        variables.audioPlayer.src="MusicLoadFolder/"+songData.id.toString()+"."+songData.musicFormat;
+        variables.audioPlayer.src=variables.musicLoadFolder+songData.id.toString()+"."+songData.musicFormat;
         ToggleButtons(true)
     }else{fs.mkdirSync(variables.musicLoadFolder);loadSong(id)}
 }
@@ -218,7 +217,12 @@ function createPlaylist(songId){
     var playlistName = document.getElementById("CreatePlaylistEntry").value
 
     var appdata = JSON.parse(fs.readFileSync(variables.appdataLoc, "utf-8"))
-    appdata.playlists.push({"PlaylistItemName": playlistName, "songsIDs": []})
+    try{
+        appdata.playlists.push({"PlaylistItemName": playlistName, "songsIDs": []})
+    }catch(e){
+        appdata["playlists"]=[]
+        appdata.playlists.push({"PlaylistItemName": playlistName, "songsIDs": []})
+    }
     
     fs.writeFileSync(variables.appdataLoc, JSON.stringify(appdata))
     showSongMorePlaylistOverPage(songId)
@@ -270,16 +274,20 @@ function openSongUrl(){if (variables.currentSongUrl!=""){require("electron").she
 
 // SetSongInfo
 function refreshSongInfo(){
-    var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
-    // try{var songImageData=fs.readFileSync(variables.cacheFolder+"image."+songData.imageFormat)}catch(e){null}
-    if(fs.existsSync(variables.musicsImageFolder+songData.id+'.'+songData.imageFormat)){
-        document.getElementById("SongInfoPicture").style.backgroundImage='url("MusicImages/'+songData.id+'.'+songData.imageFormat+'")'
-    }else{
-        document.getElementById("SongInfoPicture").style.backgroundImage="none"
+    try{
+        var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
+        // try{var songImageData=fs.readFileSync(variables.cacheFolder+"image."+songData.imageFormat)}catch(e){null}
+        if(fs.existsSync(variables.musicsImageFolder+songData.id+'.'+songData.imageFormat)){
+            document.getElementById("SongInfoPicture").style.backgroundImage='url('+variables.musicsImageFolder+songData.id+'.'+songData.imageFormat+')'
+        }else{
+            document.getElementById("SongInfoPicture").style.backgroundImage="none"
+        }
+        document.getElementById("SongInfoName").innerHTML=songData.displayName
+        document.getElementById("SongInfoArtist").innerHTML=songData.artist
+        document.getElementById("SongInfoGenre").innerHTML=songData.tags
+    }catch(e){
+        setTimeout(refreshSongInfo, 500)
     }
-    document.getElementById("SongInfoName").innerHTML=songData.displayName
-    document.getElementById("SongInfoArtist").innerHTML=songData.artist
-    document.getElementById("SongInfoGenre").innerHTML=songData.tags
 }
 
 // VolumeProgress
@@ -365,7 +373,7 @@ async function PopulateMusics(){
                     }catch(e){null}
 
                     variables.SongItemContainer.innerHTML = variables.SongItemContainer.innerHTML + '<div id="Song'+songData.id.toString()+'" class="SongItem"><div  onclick="loadAndPlaySong('+songData.id.toString()+')" class="SongItemAction"><svg class="SongItemPlay" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg></div><svg class="SongItemMore" onclick="showSongMoreOverPage('+songData.id.toString()+')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg><div class="SongItemLength">'+(songData.songLength? songData.songLength : "0:00")+'</div><div class="SongItemDisplay"></div><div class="SongItemInfo"><SongName>'+songData.displayName+'</SongName><br><OtherInfo>'+songData.artist+'<br>'+(songData.tags? songData.tags : 'N/A') +'</OtherInfo></div></div>'
-                    songData.imageFormat==null? null:document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemDisplay")[0].style.backgroundImage='url("MusicImages/'+songData.id+'.'+songData.imageFormat+'")'
+                    songData.imageFormat==null? null:document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemDisplay")[0].style.backgroundImage='url('+variables.musicsImageFolder+songData.id+'.'+songData.imageFormat+')'
                 }
             }else{fs.mkdirSync(variables.musicsImageFolder);PopulateMusics()}
         }else{fs.mkdirSync(variables.cacheFolder);PopulateMusics()}
@@ -468,7 +476,7 @@ async function showSongMoreOverPage(id){
         </div>
     </div>`
 
-    songData.imageFormat==null? null : document.getElementById("SongMoreOverlayDisplay").style.backgroundImage = "url("+"MusicImages/"+id.toString()+"."+songData.imageFormat+")"
+    songData.imageFormat==null? null : document.getElementById("SongMoreOverlayDisplay").style.backgroundImage = "url("+variables.musicsImageFolder+id.toString()+"."+songData.imageFormat+")"
     document.getElementById("OverPage").style.display = "flex"
 }
 
