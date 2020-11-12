@@ -23,7 +23,7 @@ var variables = {
     "appdataLoc": app.getPath("documents")+"\\RhymeMusic.json",
     "musicLoadFolder": app.getPath('userData')+"\\MusicLoadFolder\\",
     "rhymeMusicsFolder": app.getPath("music")+"\\RhymeMusic\\",
-    "cacheFolder": app.getPath("userData")+"\\Cache\\",
+    "cacheFolder": app.getPath("userData")+"\\RhymeMusicCache\\",
     "musicsImageFolder": (app.getPath("userData")+"\\MusicImages\\").replace(/\\/g, "/"),
     "PlaylistItemContainer": document.getElementById("PlaylistItems"),
     "SongItemContainer": document.getElementById("MainBody"),
@@ -72,7 +72,7 @@ function openCurrentSongInMiniPlayer(){
 // save .rhymemusic
 async function saveRhymeMusicFile(musicRawPath){
     if (fs.existsSync(variables.rhymeMusicsFolder)){
-        if (fs.existsSync(variables.rhymeMusicsFolder+variables.currentSaveRhymeMusicFileID.toString()+".rhymemusic")){variables.currentSaveRhymeMusicFileID=variables.currentSaveRhymeMusicFileID+1;saveRhymeMusicFile(musicRawPath)}
+        if (fs.existsSync(variables.rhymeMusicsFolder+variables.currentSaveRhymeMusicFileID+".rhymemusic")){variables.currentSaveRhymeMusicFileID=variables.currentSaveRhymeMusicFileID+1;saveRhymeMusicFile(musicRawPath)}
         else{
             // Clearing File
             clearCache()
@@ -82,7 +82,6 @@ async function saveRhymeMusicFile(musicRawPath){
             
             // Editing Song Data
             var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
-            songData.id=variables.currentSaveRhymeMusicFileID
             songData.songLength= await getSongLength(variables.cacheFolder+"music."+songData.musicFormat)
             fs.writeFileSync(variables.cacheFolder+"data.json", JSON.stringify(songData))
 
@@ -91,7 +90,7 @@ async function saveRhymeMusicFile(musicRawPath){
             var cacheFolder = fs.readdirSync(variables.cacheFolder)
             for (fileIndex in cacheFolder){zipMaker.file(cacheFolder[fileIndex], fs.readFileSync(variables.cacheFolder+cacheFolder[fileIndex]))}
             var NewZipData = await zipMaker.generateAsync({"type": "nodebuffer"})
-            fs.writeFileSync(variables.rhymeMusicsFolder+variables.currentSaveRhymeMusicFileID.toString()+".rhymemusic", NewZipData)
+            fs.writeFileSync(variables.rhymeMusicsFolder+variables.currentSaveRhymeMusicFileID+".rhymemusic", NewZipData)
 
             // Reseting currentSaveRhymeMusicFileID
             variables.currentSaveRhymeMusicFileID=0
@@ -139,7 +138,7 @@ async function extractRhymeMusicFile(fileLocation){
 async function loadSong(id){
     if(fs.existsSync(variables.musicLoadFolder)){
         clearCache()
-        await extractRhymeMusicFile(variables.rhymeMusicsFolder+id.toString()+".rhymemusic")
+        await extractRhymeMusicFile(variables.rhymeMusicsFolder+id+".rhymemusic")
         
         var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
         variables.currentSongUrl= songData.url? songData.url : ""
@@ -148,25 +147,25 @@ async function loadSong(id){
         variables.currentSongName= songData.displayName
         
         try{
-            document.getElementById("Song"+variables.preSongId.toString()).getElementsByClassName("SongItemInfo")[0].style.background = "#1BADFF"
-            document.getElementById("Song"+variables.preSongId.toString()).getElementsByClassName("SongItemPlay")[0].style.fill = "#1BADFF"
+            document.getElementById("Song"+variables.preSongId).getElementsByClassName("SongItemInfo")[0].style.background = "#1BADFF"
+            document.getElementById("Song"+variables.preSongId).getElementsByClassName("SongItemPlay")[0].style.fill = "#1BADFF"
         }catch(e){null}
-        document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemInfo")[0].style.background = "#25FFB1"
-        document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemPlay")[0].style.fill = "#25FFB1"
-        variables.preSongId=songData.id
+        document.getElementById("Song"+id).getElementsByClassName("SongItemInfo")[0].style.background = "#25FFB1"
+        document.getElementById("Song"+id).getElementsByClassName("SongItemPlay")[0].style.fill = "#25FFB1"
+        variables.preSongId=id
         
         try{clearMusicLoadFolder()}catch(e){null}
         var songBinary = fs.readFileSync(variables.cacheFolder+"music."+songData.musicFormat)
-        fs.writeFileSync(variables.musicLoadFolder+songData.id.toString()+"."+songData.musicFormat, songBinary)
+        fs.writeFileSync(variables.musicLoadFolder+id+"."+songData.musicFormat, songBinary)
         
-        variables.audioPlayer.src=variables.musicLoadFolder+songData.id.toString()+"."+songData.musicFormat;
+        variables.audioPlayer.src=variables.musicLoadFolder+id+"."+songData.musicFormat;
         ToggleButtons(true)
     }else{fs.mkdirSync(variables.musicLoadFolder);loadSong(id)}
 }
-async function loadAndPlaySong(id){await loadSong(id);variables.audioPlayer.play();refreshSongInfo()}
+async function loadAndPlaySong(id){await loadSong(id);variables.audioPlayer.play();refreshSongInfo(id)}
 
 // FormatedMusicLength
-function formatSongLength(durationRaw){return Math.floor(durationRaw/60).toString()+":"+Math.floor(durationRaw-(Math.floor(durationRaw/60)*60)).toString()}
+function formatSongLength(durationRaw){return Math.floor(durationRaw/60)+":"+Math.floor(durationRaw-(Math.floor(durationRaw/60)*60))}
 function getSongLength(songLoc){
     return new Promise((resolve)=>{
         var localAudioPlayer = new Audio()
@@ -191,7 +190,7 @@ variables.audioPlayer.addEventListener("ended", ()=>{
 // Export Song
 function exportSong(id){
     try{
-        var songDataInBin=fs.readFileSync(variables.rhymeMusicsFolder+id.toString()+".rhymemusic")
+        var songDataInBin=fs.readFileSync(variables.rhymeMusicsFolder+id+".rhymemusic")
         var saveDir = dialog.showSaveDialogSync({
             title: "Export RhymeMusic",
             buttonLabel: "Export",
@@ -206,7 +205,14 @@ function exportSong(id){
 // Delete Song
 function deleteSong(songId){
     try{
-        fs.unlinkSync(variables.rhymeMusicsFolder+songId.toString()+".rhymemusic")
+        fs.unlinkSync(variables.rhymeMusicsFolder+songId+".rhymemusic")
+
+        var rhymeMusicsFolder = fs.readdirSync(variables.rhymeMusicsFolder)
+        for(file in rhymeMusicsFolder){
+            fs.renameSync(variables.rhymeMusicsFolder+rhymeMusicsFolder[file], variables.rhymeMusicsFolder+file+".rhymemusic")
+        }
+        // Playlist ID Fix Add HERE!!!!!!!!!
+
         closeOverPage()
         fetchAllMusic()
     }catch(e){null}
@@ -252,7 +258,7 @@ function removeFromPlaylist(songId, playlistId){
 
 // Get Song lyrics
 async function getSongLyricsById(id){
-    await extractRhymeMusicFile(variables.rhymeMusicsFolder+id.toString()+".rhymemusic")
+    await extractRhymeMusicFile(variables.rhymeMusicsFolder+id+".rhymemusic")
     var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json"))
 
     if(songData.lyrics==undefined){
@@ -273,12 +279,12 @@ async function getSongLyricsById(id){
 function openSongUrl(){if (variables.currentSongUrl!=""){require("electron").shell.openExternal(variables.currentSongUrl);}}
 
 // SetSongInfo
-function refreshSongInfo(){
+function refreshSongInfo(id){
     try{
         var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
         // try{var songImageData=fs.readFileSync(variables.cacheFolder+"image."+songData.imageFormat)}catch(e){null}
-        if(fs.existsSync(variables.musicsImageFolder+songData.id+'.'+songData.imageFormat)){
-            document.getElementById("SongInfoPicture").style.backgroundImage='url('+variables.musicsImageFolder+songData.id+'.'+songData.imageFormat+')'
+        if(fs.existsSync(variables.musicsImageFolder+id+'.'+songData.imageFormat)){
+            document.getElementById("SongInfoPicture").style.backgroundImage='url('+variables.musicsImageFolder+id+'.'+songData.imageFormat+')'
         }else{
             document.getElementById("SongInfoPicture").style.backgroundImage="none"
         }
@@ -286,7 +292,7 @@ function refreshSongInfo(){
         document.getElementById("SongInfoArtist").innerHTML=songData.artist
         document.getElementById("SongInfoGenre").innerHTML=songData.tags
     }catch(e){
-        setTimeout(refreshSongInfo, 500)
+        setTimeout(()=>{refreshSongInfo(id)}, 500)
     }
 }
 
@@ -294,7 +300,7 @@ function refreshSongInfo(){
 function refreshVolume(){
     var SoundSliderValue = document.getElementById("SoundSlider").value
     variables.audioPlayer.volume=parseInt(SoundSliderValue)/100
-    document.getElementById("SoundSlider").style.background = "linear-gradient(to right, #FB1E46 "+(SoundSliderValue).toString()+"%, #606060 "+(SoundSliderValue).toString()+"%)"
+    document.getElementById("SoundSlider").style.background = "linear-gradient(to right, #FB1E46 "+(SoundSliderValue)+"%, #606060 "+(SoundSliderValue)+"%)"
 }
 
 // MusicTimeLength
@@ -304,8 +310,8 @@ function updateMusicTimeLength(){document.getElementById("SongLength").innerHTML
 function refreshMusicProgress(){
     var MusicProgressValue = document.getElementById("MusicProgressBar").value
     
-    document.getElementById("MusicProgressBar").style.background = "linear-gradient(to right, #FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
-    document.getElementById("MainActionProgress").style.background = "conic-gradient(#FB1E46 "+(MusicProgressValue/5).toString()+"%, #505050 "+(MusicProgressValue/5).toString()+"%)"
+    document.getElementById("MusicProgressBar").style.background = "linear-gradient(to right, #FB1E46 "+(MusicProgressValue/5)+"%, #505050 "+(MusicProgressValue/5)+"%)"
+    document.getElementById("MainActionProgress").style.background = "conic-gradient(#FB1E46 "+(MusicProgressValue/5)+"%, #505050 "+(MusicProgressValue/5)+"%)"
     updateMusicTimeLength()
 }
 
@@ -369,11 +375,11 @@ async function PopulateMusics(){
                     var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
                     try{
                         var songImageData=fs.readFileSync(variables.cacheFolder+"image."+songData.imageFormat)
-                        fs.writeFileSync(variables.musicsImageFolder+songData.id+'.'+songData.imageFormat, songImageData)
+                        fs.writeFileSync(variables.musicsImageFolder+MusicIndex+'.'+songData.imageFormat, songImageData)
                     }catch(e){null}
 
-                    variables.SongItemContainer.innerHTML = variables.SongItemContainer.innerHTML + '<div id="Song'+songData.id.toString()+'" class="SongItem"><div  onclick="loadAndPlaySong('+songData.id.toString()+')" class="SongItemAction"><svg class="SongItemPlay" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg></div><svg class="SongItemMore" onclick="showSongMoreOverPage('+songData.id.toString()+')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg><div class="SongItemLength">'+(songData.songLength? songData.songLength : "0:00")+'</div><div class="SongItemDisplay"></div><div class="SongItemInfo"><SongName>'+songData.displayName+'</SongName><br><OtherInfo>'+songData.artist+'<br>'+(songData.tags? songData.tags : 'N/A') +'</OtherInfo></div></div>'
-                    songData.imageFormat==null? null:document.getElementById("Song"+songData.id.toString()).getElementsByClassName("SongItemDisplay")[0].style.backgroundImage='url('+variables.musicsImageFolder+songData.id+'.'+songData.imageFormat+')'
+                    variables.SongItemContainer.innerHTML = variables.SongItemContainer.innerHTML + '<div id="Song'+MusicIndex+'" class="SongItem"><div  onclick="loadAndPlaySong('+MusicIndex+')" class="SongItemAction"><svg class="SongItemPlay" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg></div><svg class="SongItemMore" onclick="showSongMoreOverPage('+MusicIndex+')" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg><div class="SongItemLength">'+(songData.songLength? songData.songLength : "0:00")+'</div><div class="SongItemDisplay"></div><div class="SongItemInfo"><SongName>'+songData.displayName+'</SongName><br><OtherInfo>'+songData.artist+'<br>'+(songData.tags? songData.tags : 'N/A') +'</OtherInfo></div></div>'
+                    songData.imageFormat==null? null:document.getElementById("Song"+MusicIndex).getElementsByClassName("SongItemDisplay")[0].style.backgroundImage='url('+variables.musicsImageFolder+MusicIndex+'.'+songData.imageFormat+')'
                 }
             }else{fs.mkdirSync(variables.musicsImageFolder);PopulateMusics()}
         }else{fs.mkdirSync(variables.cacheFolder);PopulateMusics()}
@@ -396,7 +402,7 @@ function PopulatePlaylist(){
         
         variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="PlaylistAll" onclick="playPlaylist(\'All\')" class="DrawerSectionItem">All</div>'
         for(Item in appdata.playlists){
-            variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="Playlist'+Item.toString()+'" onclick="playPlaylist('+Item.toString()+')" class="DrawerSectionItem">'+appdata.playlists[Item].PlaylistItemName+'</div>'
+            variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="Playlist'+Item+'" onclick="playPlaylist('+Item+')" class="DrawerSectionItem">'+appdata.playlists[Item].PlaylistItemName+'</div>'
         }
     }else{fs.writeFileSync(variables.appdataLoc, "{}");PopulatePlaylist()}
 }
@@ -405,11 +411,11 @@ PopulatePlaylist()
 // PlaylistControl
 function setPlaylistActive(id){
     try{
-        document.getElementById("Playlist"+variables.prePlayList.toString()).style.background="#606060"
-        document.getElementById("Playlist"+variables.prePlayList.toString()).style.color="#F3F3F3"
+        document.getElementById("Playlist"+variables.prePlayList).style.background="#606060"
+        document.getElementById("Playlist"+variables.prePlayList).style.color="#F3F3F3"
     }catch(e){null}
-    document.getElementById("Playlist"+id.toString()).style.background="#25FFB1"
-    document.getElementById("Playlist"+id.toString()).style.color="#303030"
+    document.getElementById("Playlist"+id).style.background="#25FFB1"
+    document.getElementById("Playlist"+id).style.color="#303030"
 
     variables.prePlayList=id
 }
@@ -424,7 +430,7 @@ function playPlaylist(id){
         if(playlistSongs.length!=0){
             variables.allMusics=[]
             for (Items in playlistSongs){
-                if(fs.existsSync(variables.rhymeMusicsFolder+playlistSongs[Items].toString()+".rhymemusic")){variables.allMusics.push(playlistSongs[Items].toString()+".rhymemusic")}
+                if(fs.existsSync(variables.rhymeMusicsFolder+playlistSongs[Items]+".rhymemusic")){variables.allMusics.push(playlistSongs[Items]+".rhymemusic")}
             }
             setPlaylistActive(id)
             PopulateMusics()
@@ -446,7 +452,7 @@ function closeOverPage(){
 }
 
 async function showSongMoreOverPage(id){
-    var rhymeMusic = fs.readFileSync(variables.rhymeMusicsFolder+id.toString()+".rhymemusic")
+    var rhymeMusic = fs.readFileSync(variables.rhymeMusicsFolder+id+".rhymemusic")
     await extractRhymeMusicFile(rhymeMusic)
     var songData = JSON.parse(fs.readFileSync(variables.cacheFolder+"data.json", "utf-8"))
 
@@ -460,7 +466,7 @@ async function showSongMoreOverPage(id){
                 Tags: `+(songData.tags || "N/A")+`<br>
                 URL: `+(songData.url==null? "N/A" : songData.url.split("https://")[1])+`<br>
                 Length: `+songData.songLength+`<br>
-                ID: `+songData.id+`
+                ID: `+(id)+`
             </div>
         </div>
         <div id="SongMoreOverlayRight">
@@ -476,7 +482,7 @@ async function showSongMoreOverPage(id){
         </div>
     </div>`
 
-    songData.imageFormat==null? null : document.getElementById("SongMoreOverlayDisplay").style.backgroundImage = "url("+variables.musicsImageFolder+id.toString()+"."+songData.imageFormat+")"
+    songData.imageFormat==null? null : document.getElementById("SongMoreOverlayDisplay").style.backgroundImage = "url("+variables.musicsImageFolder+id+"."+songData.imageFormat+")"
     document.getElementById("OverPage").style.display = "flex"
 }
 
@@ -489,9 +495,9 @@ function showSongMorePlaylistOverPage(songId){
         var playlistName = appdata.playlists[playlist].PlaylistItemName
         var playlistSongs = appdata.playlists[playlist].songsIDs
         if(playlistSongs.includes(songId)){
-            playlistItemsTag = playlistItemsTag + '<div class="PlaylistItem" onclick="removeFromPlaylist('+songId.toString()+','+playlist.toString()+')">'+playlistName+'<svg class="PlaylistItemRemove" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18 13H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"/></svg></div>'
+            playlistItemsTag = playlistItemsTag + '<div class="PlaylistItem" onclick="removeFromPlaylist('+songId+','+playlist+')">'+playlistName+'<svg class="PlaylistItemRemove" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18 13H6c-.55 0-1-.45-1-1s.45-1 1-1h12c.55 0 1 .45 1 1s-.45 1-1 1z"/></svg></div>'
         }else{
-            playlistItemsTag = playlistItemsTag + '<div class="PlaylistItem" onclick="addToPlaylist('+songId.toString()+','+playlist.toString()+')">'+playlistName+'<svg class="PlaylistItemAdd" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M18 13h-5v5c0 .55-.45 1-1 1s-1-.45-1-1v-5H6c-.55 0-1-.45-1-1s.45-1 1-1h5V6c0-.55.45-1 1-1s1 .45 1 1v5h5c.55 0 1 .45 1 1s-.45 1-1 1z"></path></svg></div>'
+            playlistItemsTag = playlistItemsTag + '<div class="PlaylistItem" onclick="addToPlaylist('+songId+','+playlist+')">'+playlistName+'<svg class="PlaylistItemAdd" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M18 13h-5v5c0 .55-.45 1-1 1s-1-.45-1-1v-5H6c-.55 0-1-.45-1-1s.45-1 1-1h5V6c0-.55.45-1 1-1s1 .45 1 1v5h5c.55 0 1 .45 1 1s-.45 1-1 1z"></path></svg></div>'
         }
     }
 

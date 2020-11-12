@@ -8,9 +8,11 @@
 - ~~Add **Subtitle/Lyrics** Viewer.~~
 - ~~Add edit/open **Subtitle/Lyrics** button to **Song More** page.~~
 - ~~**Minimum** word when creating rhymemusicFile.~~
+- ~~Add Some Sort of **Help** Page.~~
+- Fix lyrics to be multilined.
 - Add a way **hide empty** or to possibily **Delete** a playlist.
 - Add **Searching** ability.
-- Add **Shortcut**.
+- Add Keyboard **Shortcut(s)**.
 - Add **Clear Cache** on program exit.
 - Add Functionality to **MiniPlayer**.
 - Handle **System Arguments** for playing and adding music.
@@ -24,15 +26,15 @@
 
 - Make better **Report** and **Credit** Page W/Social Media Links.
 - Add **Setting** Page.
-- Add Some Sort of **Help** Page.
 - Make a **Easter Egg**.
 - no **console** access warning.
 
 - Future Optimizations
-    - when populating musics instead of loading it w\ music in it just decode "Data json" & "image.*". 
+    - when populating musics instead of loading it w\ music in it just decode "Data json" & "image.*".
+    - When deleting music sync the playlist music id(s).
 ---
 ### Optional To Do:
 - Make a way to update to newer versions
 - Make **failsafe** music extact/file-read system *(BUGFIX)*
 ---
-### Total Bugs Fixed: `12+`
+### Total Bugs Fixed: `15+`

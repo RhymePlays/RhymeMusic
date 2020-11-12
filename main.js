@@ -34,8 +34,7 @@ function createAddWin(){
         }
     })
 
-    addWin.loadFile("Pages/CreateRhymemusicPage/CreateRhymemusicPage.html")
-    // addWin.webContents.openDevTools()
+    addWin.loadFile("Pages/CreateRhymemusicPage/CreateRhymeMusicPage.html")
 }
 ipcMain.on("createAddWindow", (mainPageEvent, arg)=>{
     createAddWin()
