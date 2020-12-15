@@ -21,9 +21,9 @@ var variables = {
     "preSongId": "",
     "allMusics": [],
     "appdataLoc": app.getPath("documents")+"\\RhymeMusic.json",
-    "musicLoadFolder": app.getPath('userData')+"\\MusicLoadFolder\\",
     "rhymeMusicsFolder": app.getPath("music")+"\\RhymeMusic\\",
     "cacheFolder": app.getPath("userData")+"\\RhymeMusicCache\\",
+    "musicLoadFolder": app.getPath('userData')+"\\MusicLoadFolder\\",
     "musicsImageFolder": (app.getPath("userData")+"\\MusicImages\\").replace(/\\/g, "/"),
     "PlaylistItemContainer": document.getElementById("PlaylistItems"),
     "SongItemContainer": document.getElementById("MainBody"),
@@ -32,7 +32,7 @@ var variables = {
 // TitleBarLogic
 win.on("maximize", () => {document.getElementById("MaximizeButton").innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 16h2v2c0 .55.45 1 1 1s1-.45 1-1v-3c0-.55-.45-1-1-1H6c-.55 0-1 .45-1 1s.45 1 1 1zm2-8H6c-.55 0-1 .45-1 1s.45 1 1 1h3c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1s-1 .45-1 1v2zm7 11c.55 0 1-.45 1-1v-2h2c.55 0 1-.45 1-1s-.45-1-1-1h-3c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1zm1-11V6c0-.55-.45-1-1-1s-1 .45-1 1v3c0 .55.45 1 1 1h3c.55 0 1-.45 1-1s-.45-1-1-1h-2z"/></svg>'})
 win.on("unmaximize", () => {document.getElementById("MaximizeButton").innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 14c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h3c.55 0 1-.45 1-1s-.45-1-1-1H7v-2c0-.55-.45-1-1-1zm0-4c.55 0 1-.45 1-1V7h2c.55 0 1-.45 1-1s-.45-1-1-1H6c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1zm11 7h-2c-.55 0-1 .45-1 1s.45 1 1 1h3c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1s-1 .45-1 1v2zM14 6c0 .55.45 1 1 1h2v2c0 .55.45 1 1 1s1-.45 1-1V6c0-.55-.45-1-1-1h-3c-.55 0-1 .45-1 1z"/></svg>'})
-function closeWindow(){win.close()}
+function closeWindow(){win.close();clearAllCache()}
 function maximizeWindow(){win.isMaximized() ? win.unmaximize() : win.maximize()}
 function minimizeWindow(){win.minimize()}
 function addMusic(){
@@ -127,6 +127,7 @@ function clearMusicsImageFolder(){
         }catch(e){null}
     }
 }
+function clearAllCache(){clearCache();clearMusicLoadFolder();clearMusicsImageFolder()}
 
 // .rhymemusicExtract
 async function extractRhymeMusicFile(fileLocation){
@@ -402,7 +403,9 @@ function PopulatePlaylist(){
         
         variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="PlaylistAll" onclick="playPlaylist(\'All\')" class="DrawerSectionItem">All</div>'
         for(Item in appdata.playlists){
-            variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="Playlist'+Item+'" onclick="playPlaylist('+Item+')" class="DrawerSectionItem">'+appdata.playlists[Item].PlaylistItemName+'</div>'
+            if (appdata.playlists[Item].songsIDs.length != 0){
+                variables.PlaylistItemContainer.innerHTML=variables.PlaylistItemContainer.innerHTML+'<div id="Playlist'+Item+'" onclick="playPlaylist('+Item+')" class="DrawerSectionItem">'+appdata.playlists[Item].PlaylistItemName+'</div>'
+            }
         }
     }else{fs.writeFileSync(variables.appdataLoc, "{}");PopulatePlaylist()}
 }
@@ -550,7 +553,7 @@ function showAbout(){
         <div id="TextOverPageTitle">About.</div><br>
 
         RhymeMusic is a product of Isfar Tausif Rhyme.<br><br>
-        RhymeMusic is a simple music player program. The RhymeMusic Project, was first started in "<b>Thu Oct 15 12:38:18 2020 +0600</b>". ElectronJS framework used in the making of this program
+        RhymeMusic is a simple music player program. The RhymeMusic Project, was first started in "<b>Thu Oct 15 12:38:18 2020 +0600</b>". ElectronJS framework used in the making of this program. <br>
         Third-Party resources like <b>Material.io</b> icons and others used.<br>
         
         <b><h3>Notable features of RhymeMusic:</h3></b>
@@ -571,7 +574,7 @@ function showAbout(){
         Bug fixes and new stuff are being added frequently.<br><br>
 
         RhymeMusic V_0.1.0 (DevBuild)<br>
-        Copyright © 2019 Isfar Tausif Rhyme. All rights reserved.
+        Copyright © 2020 Isfar Tausif Rhyme. All rights reserved.
     </div>`
     document.getElementById("OverPage").style.display = "flex"
 }
@@ -581,7 +584,7 @@ function showCredits(){
         <div id="CloseTextOverlay" onclick="closeOverPage()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" width="18px" height="18px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18.3 5.71c-.39-.39-1.02-.39-1.41 0L12 10.59 7.11 5.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L10.59 12 5.7 16.89c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L12 13.41l4.89 4.89c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z"/></svg></div>
         <div id="TextOverPageTitle">Credits.</div><br>
 
-        Isfar Tausif Rhyme is the sole developer behind RhymeMusic
+        Isfar Tausif Rhyme is the sole developer behind RhymeMusic.<br>
         ElectronJS Framework and Material.io icons used.
 
         <h4>Follow my Social Medias.</h4>
@@ -604,7 +607,7 @@ function showBugReport(){
         Take screenshots if possible.<br>
         Report to <a href="mailto:isfartousif2@gmail.com">isfartousif2@gmail.com</a><br><br>
 
-        We'll try our best to fix the bug.
+        I'll try my best to fix the bug(s).
     </div>`
     
     document.getElementById("OverPage").style.display = "flex"

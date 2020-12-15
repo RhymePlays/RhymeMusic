@@ -46,7 +46,7 @@ async function createButton(){
             "artist": document.getElementById("ArtistEntry").value==""? null: document.getElementById("ArtistEntry").value,
             "url": document.getElementById("URLEntry").value==""? null: document.getElementById("URLEntry").value,
             "tags": document.getElementById("TagsEntry").value==""? null: document.getElementById("TagsEntry").value.split(" "),
-            "lyrics": document.getElementById("LyricsEntry").value==""? null: document.getElementById("LyricsEntry").value,
+            "lyrics": document.getElementById("LyricsEntry").value==""? null: document.getElementById("LyricsEntry").value.replaceAll("\n", "<br>"),
             "musicFormat": vars.musicPath.ext.split(".")[1],
             "imageFormat": vars.imagePath? vars.imagePath.ext.split(".")[1]: null,
         }

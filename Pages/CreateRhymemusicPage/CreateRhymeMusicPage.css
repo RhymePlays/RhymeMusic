@@ -1,5 +1,8 @@
 /* Global */
-html{height: 100%;/*FooterStickTrick*/}
+html{
+    height: 100%;/*FooterStickTrick*/
+    user-select: none;
+}
 body{
     height: 100%;
     font-family: Montserrat, Roboto, Arial, Helvetica, sans-serif;
