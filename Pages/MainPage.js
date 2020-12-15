@@ -5,6 +5,8 @@ const path = require('path')
 const decompress = require('decompress')
 const JSZip = require('jszip')
 
+console.log("Hey! You found the easter egg!")
+
 // Variables
 var win = getCurrentWindow()
 var variables = {
@@ -298,10 +300,12 @@ function refreshSongInfo(id){
 }
 
 // VolumeProgress
-function refreshVolume(){
-    var SoundSliderValue = document.getElementById("SoundSlider").value
-    variables.audioPlayer.volume=parseInt(SoundSliderValue)/100
-    document.getElementById("SoundSlider").style.background = "linear-gradient(to right, #FB1E46 "+(SoundSliderValue)+"%, #606060 "+(SoundSliderValue)+"%)"
+function refreshVolume(){setVolume(document.getElementById("SoundSlider").value)}
+function setVolume(value){
+    try{
+        variables.audioPlayer.volume=parseInt(value)/100
+        document.getElementById("SoundSlider").style.background = "linear-gradient(to right, #FB1E46 "+(value)+"%, #606060 "+(value)+"%)"
+    }catch(e){}
 }
 
 // MusicTimeLength
@@ -313,6 +317,7 @@ function refreshMusicProgress(){
     
     document.getElementById("MusicProgressBar").style.background = "linear-gradient(to right, #FB1E46 "+(MusicProgressValue/5)+"%, #505050 "+(MusicProgressValue/5)+"%)"
     document.getElementById("MainActionProgress").style.background = "conic-gradient(#FB1E46 "+(MusicProgressValue/5)+"%, #505050 "+(MusicProgressValue/5)+"%)"
+    win.setProgressBar(MusicProgressValue/500)
     updateMusicTimeLength()
 }
 
@@ -353,6 +358,24 @@ function playPreviousSong(){
         }
     }
 }
+
+// Keyboard Control
+document.addEventListener("keypress", function(event) {
+    if(event.key==" "){mainAction()}
+    else if(event.key=="n"){playNextSong()}
+    else if(event.key=="p"){playPreviousSong()}
+    else if(event.key=="m"){setVolume(0)}
+    else if(event.key=="w"){
+        volumeValue=variables.audioPlayer.volume*100
+        if(volumeValue>0 && volumeValue<100){setVolume(volumeValue+10)}
+    }
+    else if(event.key=="s"){
+        volumeValue=variables.audioPlayer.volume*100
+        if(volumeValue>0 && volumeValue<100){setVolume(volumeValue-10)}
+    }
+    else if(event.key=="c"){openCurrentSongLyrics()}
+    else if(event.key=="x"){toggleSuffleLoop()}
+})
 /* Media Control Side End */
 
 
