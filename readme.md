@@ -3,7 +3,6 @@
 ## DevLog
 ---
 ### To do:
-- Make it work with youtube (EG: Streaming, "My Mix", and Download)
 - Add Functionality to **MiniPlayer**.
 - Add **Searching** ability. (Having second thoughts)
 
@@ -21,6 +20,7 @@
 ---
 ### Optional To Do:
 - Make a way to update to newer versions
+- Make it work with youtube (EG: Streaming, "My Mix", and Download)
 - Make **failsafe** music extact/file-read system *(BUGFIX)*
 ---
 - Search and fix **Bugs**.
